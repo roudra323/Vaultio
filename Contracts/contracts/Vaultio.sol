@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title Vaultio
  * @dev Token locking vault with time-based withdrawals
  * @notice Users can lock ERC-20 tokens for a specified duration
+ * @notice Uses SafeERC20 for secure token transfers and proper error handling
  * @notice Does not use ReentrancyGuard - protection via state updates before external calls
  */
 contract Vaultio {
+    using SafeERC20 for IERC20;
+
     // ============ Custom Errors ============
 
     error InvalidTokenAddress();
@@ -17,19 +21,19 @@ contract Vaultio {
     error InvalidDuration();
     error InsufficientTokenBalance();
     error InsufficientTokenAllowance();
-    error TokenTransferFailed();
     error InvalidLockId();
     error TokensAlreadyWithdrawn();
     error LockPeriodNotExpired();
+    error CallerIsNotAnWalletAddress();
 
     // ============ Structs ============
 
     struct Lock {
-        address token; // ERC-20 token address
-        uint256 amount; // Locked token amount
-        uint256 startTime; // Block timestamp when locked
-        uint256 unlockTime; // Block timestamp when withdrawable
-        bool withdrawn; // Whether tokens have been withdrawn
+        address token;
+        uint256 amount;
+        uint256 startTime;
+        uint256 unlockTime;
+        bool withdrawn;
     }
 
     // ============ State Variables ============
@@ -62,10 +66,7 @@ contract Vaultio {
      * @param amount The amount of tokens to lock
      * @param durationInMinutes Lock duration in minutes
      * @return lockId The ID of the created lock
-     * @dev This contract does not use ReentrancyGuard because:
-     *      1. The withdrawn flag is set to true before any external token transfers
-     *      2. All state changes follow the Checks-Effects-Interactions pattern
-     *      3. The require(!lock.withdrawn) check prevents reentrancy attacks
+     * @dev Uses SafeERC20 to handle non-standard ERC20 tokens properly
      */
     function lockTokens(
         address token,
@@ -73,6 +74,8 @@ contract Vaultio {
         uint256 durationInMinutes
     ) external returns (uint256 lockId) {
         // ============ Checks ============
+
+        if (msg.sender.code.length != 0) revert CallerIsNotAnWalletAddress();
         if (token == address(0)) revert InvalidTokenAddress();
         if (amount == 0) revert InvalidAmount();
         if (durationInMinutes == 0) revert InvalidDuration();
@@ -108,13 +111,9 @@ contract Vaultio {
 
         // ============ Interactions ============
 
-        // Transfer tokens from user to this contract
-        bool success = tokenContract.transferFrom(
-            msg.sender,
-            address(this),
-            amount
-        );
-        if (!success) revert TokenTransferFailed();
+        // SafeERC20 will automatically revert if transfer fails
+        // Handles tokens that don't return bool, return false, or revert
+        tokenContract.safeTransferFrom(msg.sender, address(this), amount);
 
         emit TokenLocked(msg.sender, token, lockId, amount, unlockTime);
 
@@ -125,6 +124,7 @@ contract Vaultio {
      * @notice Withdraw tokens from a specific lock
      * @param lockId The ID of the lock to withdraw from
      * @dev State is updated before external call (withdrawn = true) to prevent reentrancy
+     * @dev SafeERC20.safeTransfer will revert if transfer fails for any reason
      */
     function withdrawTokens(uint256 lockId) external {
         // ============ Checks ============
@@ -145,9 +145,7 @@ contract Vaultio {
 
         // ============ Interactions ============
 
-        // Transfer tokens back to user
-        bool success = IERC20(token).transfer(msg.sender, amount);
-        if (!success) revert TokenTransferFailed();
+        IERC20(token).safeTransfer(msg.sender, amount);
 
         emit TokenWithdrawn(msg.sender, token, lockId, amount);
     }
@@ -202,26 +200,5 @@ contract Vaultio {
 
         Lock memory lock = userLocks[user][lockId];
         return !lock.withdrawn && block.timestamp >= lock.unlockTime;
-    }
-
-    /**
-     * @notice Get time remaining until unlock (0 if already unlocked)
-     * @param user The address of the user
-     * @param lockId The ID of the lock
-     * @return Seconds remaining until unlock
-     */
-    function getTimeUntilUnlock(
-        address user,
-        uint256 lockId
-    ) external view returns (uint256) {
-        if (lockId >= userLocks[user].length) revert InvalidLockId();
-
-        Lock memory lock = userLocks[user][lockId];
-
-        if (block.timestamp >= lock.unlockTime) {
-            return 0;
-        }
-
-        return lock.unlockTime - block.timestamp;
     }
 }
