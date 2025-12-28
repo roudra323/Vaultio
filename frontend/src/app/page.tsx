@@ -5,7 +5,7 @@ import { HeroSection } from "@/components/landing";
 
 const HomePage = () => {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background min-h-screen">
       <Header />
       <HeroSection />
     </main>

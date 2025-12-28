@@ -45,18 +45,12 @@ type VaultioContextState = {
   fetchUserLocks: () => Promise<void>;
   checkAllowance: (tokenAddress: string, amount: string) => Promise<boolean>;
   approveTokens: (tokenAddress: string, amount: string) => Promise<boolean>;
-  lockTokens: (
-    tokenAddress: string,
-    amount: string,
-    durationInMinutes: number
-  ) => Promise<boolean>;
+  lockTokens: (tokenAddress: string, amount: string, durationInMinutes: number) => Promise<boolean>;
   withdrawTokens: (lockId: number) => Promise<boolean>;
 };
 
 // Create context with default values
-const VaultioContext = createContext<VaultioContextState | undefined>(
-  undefined
-);
+const VaultioContext = createContext<VaultioContextState | undefined>(undefined);
 
 // Provider props
 type VaultioProviderProps = {
@@ -130,10 +124,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       try {
         const signer = getSigner();
         const tokenContract = getERC20Contract(tokenAddress, signer);
-        const allowance = await tokenContract.allowance(
-          address,
-          VAULTIO_ADDRESS
-        );
+        const allowance = await tokenContract.allowance(address, VAULTIO_ADDRESS);
         const amountInWei = parseTokenAmount(amount);
 
         return allowance.lt(amountInWei);
@@ -178,11 +169,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
 
   // Lock tokens
   const lockTokens = useCallback(
-    async (
-      tokenAddress: string,
-      amount: string,
-      durationInMinutes: number
-    ): Promise<boolean> => {
+    async (tokenAddress: string, amount: string, durationInMinutes: number): Promise<boolean> => {
       if (!address || !walletClient) {
         toast.error("Please connect your wallet");
         return false;
@@ -194,11 +181,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
         const vaultioContract = getVaultioContract(signer);
         const amountInWei = parseTokenAmount(amount);
 
-        const tx = await vaultioContract.lockTokens(
-          tokenAddress,
-          amountInWei,
-          durationInMinutes
-        );
+        const tx = await vaultioContract.lockTokens(tokenAddress, amountInWei, durationInMinutes);
 
         toast.loading("Locking tokens...", { id: "lock" });
         await tx.wait();
@@ -279,9 +262,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     ]
   );
 
-  return (
-    <VaultioContext.Provider value={value}>{children}</VaultioContext.Provider>
-  );
+  return <VaultioContext.Provider value={value}>{children}</VaultioContext.Provider>;
 };
 
 // Custom hook to use the Vaultio context

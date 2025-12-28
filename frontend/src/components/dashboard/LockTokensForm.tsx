@@ -31,13 +31,7 @@ export const LockTokensForm = () => {
   const [step, setStep] = useState<"approve" | "lock">("approve");
   const [isApproved, setIsApproved] = useState(false);
 
-  const {
-    approveTokens,
-    lockTokens,
-    isApproving,
-    isLocking,
-    checkAllowance,
-  } = useVaultio();
+  const { approveTokens, lockTokens, isApproving, isLocking, checkAllowance } = useVaultio();
 
   // Check allowance when token address or amount changes
   useEffect(() => {
@@ -80,7 +74,7 @@ export const LockTokensForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (step === "approve") {
       await handleApprove();
     } else {
@@ -90,22 +84,24 @@ export const LockTokensForm = () => {
 
   const isLoading = isApproving || isLocking;
   const isValid = tokenAddress && amount && parseFloat(amount) > 0;
-  
+
   const buttonText = isApproving
     ? "Approving..."
     : isLocking
-    ? "Locking..."
-    : step === "approve"
-    ? "Approve Tokens"
-    : "Lock Tokens";
+      ? "Locking..."
+      : step === "approve"
+        ? "Approve Tokens"
+        : "Lock Tokens";
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="mx-auto max-w-xl">
       <div className="vaultio-card p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Token Address */}
           <div className="space-y-2">
-            <Label htmlFor="tokenAddress" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            <Label
+              htmlFor="tokenAddress"
+              className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
               Token Address
             </Label>
             <Input
@@ -114,7 +110,7 @@ export const LockTokensForm = () => {
               placeholder="0x..."
               value={tokenAddress}
               onChange={(e) => setTokenAddress(e.target.value)}
-              className="bg-secondary border-border text-white placeholder:text-muted-foreground focus:border-vaultio-cyan focus:ring-vaultio-cyan/20"
+              className="bg-secondary border-border placeholder:text-muted-foreground focus:border-vaultio-cyan focus:ring-vaultio-cyan/20 text-white"
             />
           </div>
 
@@ -122,7 +118,9 @@ export const LockTokensForm = () => {
           <div className="grid grid-cols-2 gap-4">
             {/* Amount */}
             <div className="space-y-2">
-              <Label htmlFor="amount" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              <Label
+                htmlFor="amount"
+                className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
                 Amount
               </Label>
               <Input
@@ -133,17 +131,19 @@ export const LockTokensForm = () => {
                 step="any"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="bg-secondary border-border text-white placeholder:text-muted-foreground focus:border-vaultio-cyan focus:ring-vaultio-cyan/20"
+                className="bg-secondary border-border placeholder:text-muted-foreground focus:border-vaultio-cyan focus:ring-vaultio-cyan/20 text-white"
               />
             </div>
 
             {/* Duration */}
             <div className="space-y-2">
-              <Label htmlFor="duration" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              <Label
+                htmlFor="duration"
+                className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
                 Duration
               </Label>
               <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger className="bg-secondary border-border text-white focus:border-vaultio-cyan focus:ring-vaultio-cyan/20">
+                <SelectTrigger className="bg-secondary border-border focus:border-vaultio-cyan focus:ring-vaultio-cyan/20 text-white">
                   <SelectValue placeholder="Select duration" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
@@ -151,8 +151,7 @@ export const LockTokensForm = () => {
                     <SelectItem
                       key={option.value}
                       value={option.value}
-                      className="text-white hover:bg-secondary focus:bg-secondary"
-                    >
+                      className="hover:bg-secondary focus:bg-secondary text-white">
                       {option.label}
                     </SelectItem>
                   ))}
@@ -164,19 +163,29 @@ export const LockTokensForm = () => {
           {/* Progress indicator */}
           {isValid && (
             <div className="flex items-center gap-4 text-sm">
-              <div className={`flex items-center gap-2 ${step === "approve" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  isApproved ? "bg-vaultio-cyan text-white" : step === "approve" ? "border-2 border-vaultio-cyan" : "border border-muted-foreground"
-                }`}>
+              <div
+                className={`flex items-center gap-2 ${step === "approve" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                    isApproved
+                      ? "bg-vaultio-cyan text-white"
+                      : step === "approve"
+                        ? "border-vaultio-cyan border-2"
+                        : "border-muted-foreground border"
+                  }`}>
                   {isApproved ? "✓" : "1"}
                 </div>
                 <span>Approve</span>
               </div>
-              <div className="flex-1 h-px bg-border" />
-              <div className={`flex items-center gap-2 ${step === "lock" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  step === "lock" ? "border-2 border-vaultio-cyan" : "border border-muted-foreground"
-                }`}>
+              <div className="bg-border h-px flex-1" />
+              <div
+                className={`flex items-center gap-2 ${step === "lock" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                    step === "lock"
+                      ? "border-vaultio-cyan border-2"
+                      : "border-muted-foreground border"
+                  }`}>
                   2
                 </div>
                 <span>Lock</span>
@@ -188,9 +197,8 @@ export const LockTokensForm = () => {
           <button
             type="submit"
             disabled={isLoading || !isValid}
-            className="w-full py-4 rounded-full bg-gradient-to-r from-vaultio-purple to-vaultio-cyan text-white font-semibold text-base hover:shadow-lg hover:shadow-vaultio-purple/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+            className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/30 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r py-4 text-base font-semibold text-white transition-all duration-200 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
+            {isLoading && <Loader2 className="h-5 w-5 animate-spin" />}
             {buttonText}
           </button>
         </form>

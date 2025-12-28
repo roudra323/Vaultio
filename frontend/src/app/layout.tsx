@@ -18,7 +18,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Vaultio - Secure Token Locking",
-  description: "Lock, manage, and withdraw assets through a transparent on-chain vault. The most trusted protocol for asset security.",
+  description:
+    "Lock, manage, and withdraw assets through a transparent on-chain vault. The most trusted protocol for asset security.",
 };
 
 const RootLayout = ({
@@ -28,9 +29,7 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+      <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}>
         <Web3Provider>
           {children}
           <Toaster position="bottom-center" />

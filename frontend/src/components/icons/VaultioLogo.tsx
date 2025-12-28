@@ -12,8 +12,7 @@ export const VaultioLogo = ({ className, size = 32 }: VaultioLogoProps) => (
     viewBox="0 0 32 32"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={cn(className)}
-  >
+    className={cn(className)}>
     <rect width="32" height="32" rx="8" fill="url(#vaultio-logo-gradient)" />
     <rect
       x="0.627"
@@ -39,8 +38,7 @@ export const VaultioLogo = ({ className, size = 32 }: VaultioLogoProps) => (
         cx="0.5"
         cy="0"
         r="1.1158"
-        gradientUnits="objectBoundingBox"
-      >
+        gradientUnits="objectBoundingBox">
         <stop offset="0%" stopColor="#7F22FE" />
         <stop offset="100%" stopColor="#2DBEE8" />
       </radialGradient>
@@ -49,8 +47,7 @@ export const VaultioLogo = ({ className, size = 32 }: VaultioLogoProps) => (
         cx="0.5"
         cy="0"
         r="1"
-        gradientUnits="objectBoundingBox"
-      >
+        gradientUnits="objectBoundingBox">
         <stop stopColor="#B9DCFF" />
         <stop offset="1" stopColor="#8E51FF" />
       </radialGradient>

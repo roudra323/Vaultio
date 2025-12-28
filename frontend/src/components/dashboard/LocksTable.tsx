@@ -67,18 +67,16 @@ export const LocksTable = () => {
   if (isLoadingLocks) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-vaultio-cyan border-t-transparent rounded-full" />
+        <div className="border-vaultio-cyan h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
       </div>
     );
   }
 
   if (!userLocks || userLocks.length === 0) {
     return (
-      <div className="text-center py-20">
+      <div className="py-20 text-center">
         <p className="text-muted-foreground text-lg">No locks found.</p>
-        <p className="text-muted-foreground text-sm mt-2">
-          Lock some tokens to see them here.
-        </p>
+        <p className="text-muted-foreground mt-2 text-sm">Lock some tokens to see them here.</p>
       </div>
     );
   }
@@ -89,24 +87,12 @@ export const LocksTable = () => {
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">
-                Token Address
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium">
-                Amount
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium">
-                Start Time
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium">
-                Unlock Time
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium">
-                Status
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Action
-              </TableHead>
+              <TableHead className="text-muted-foreground font-medium">Token Address</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Amount</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Start Time</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Unlock Time</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Status</TableHead>
+              <TableHead className="text-muted-foreground text-right font-medium">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -115,37 +101,24 @@ export const LocksTable = () => {
               const canWithdraw = unlocked && !lock.withdrawn;
 
               return (
-                <TableRow
-                  key={index}
-                  className="border-border hover:bg-secondary/30"
-                >
+                <TableRow key={index} className="border-border hover:bg-secondary/30">
                   <TableCell className="font-mono text-white">
                     {shortenAddress(lock.token)}
                   </TableCell>
                   <TableCell className="text-white">
                     {ethers.utils.formatUnits(lock.amount, 18)}
                   </TableCell>
-                  <TableCell className="text-white">
-                    {formatDate(lock.startTime)}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {formatDate(lock.unlockTime)}
-                  </TableCell>
+                  <TableCell className="text-white">{formatDate(lock.startTime)}</TableCell>
+                  <TableCell className="text-white">{formatDate(lock.unlockTime)}</TableCell>
                   <TableCell>
                     {lock.withdrawn ? (
-                      <Badge
-                        variant="outline"
-                        className="status-withdrawn gap-1.5"
-                      >
-                        <CheckCircle className="w-3.5 h-3.5" />
+                      <Badge variant="outline" className="status-withdrawn gap-1.5">
+                        <CheckCircle className="h-3.5 w-3.5" />
                         Withdrawn
                       </Badge>
                     ) : (
-                      <Badge
-                        variant="outline"
-                        className="status-locked gap-1.5"
-                      >
-                        <Clock className="w-3.5 h-3.5" />
+                      <Badge variant="outline" className="status-locked gap-1.5">
+                        <Clock className="h-3.5 w-3.5" />
                         Locked
                       </Badge>
                     )}
@@ -154,8 +127,7 @@ export const LocksTable = () => {
                     {canWithdraw && (
                       <button
                         onClick={() => handleWithdrawClick(lock, index)}
-                        className="px-5 py-2 rounded-full bg-vaultio-cyan text-white font-medium text-sm hover:bg-vaultio-cyan-dark transition-colors"
-                      >
+                        className="bg-vaultio-cyan hover:bg-vaultio-cyan-dark rounded-full px-5 py-2 text-sm font-medium text-white transition-colors">
                         Withdraw
                       </button>
                     )}

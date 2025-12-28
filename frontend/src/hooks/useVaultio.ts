@@ -4,11 +4,11 @@ import { useVaultioContext, type Lock } from "@/contexts/VaultioContext";
 
 /**
  * Custom hook to interact with the Vaultio contract
- * 
+ *
  * This hook provides access to the VaultioContext which manages:
  * - Contract interactions using Ethers v5
  * - State management for locks, loading states, and transaction states
- * 
+ *
  * The context uses Wagmi's WalletClient for wallet connection
  * but Ethers v5 for all contract interactions
  */

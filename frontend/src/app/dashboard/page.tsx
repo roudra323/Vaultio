@@ -28,33 +28,25 @@ const DashboardPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background min-h-screen">
       <Header />
-      
-      <div className="pt-24 px-6 pb-12">
-        <div className="max-w-5xl mx-auto">
+
+      <div className="px-6 pt-24 pb-12">
+        <div className="mx-auto max-w-5xl">
           {/* Wallet Greeting */}
-          <div className="text-center mb-10">
-            <h1 className="text-2xl md:text-3xl font-semibold mb-2">
+          <div className="mb-10 text-center">
+            <h1 className="mb-2 text-2xl font-semibold md:text-3xl">
               <span className="text-white">Hi, this is your wallet address : </span>
               <span className="gradient-text">{shortenAddress(address)}</span>
             </h1>
-            <p className="text-muted-foreground">
-              Manage your secured assets with confidence.
-            </p>
+            <p className="text-muted-foreground">Manage your secured assets with confidence.</p>
           </div>
 
           {/* Tab Navigation */}
           <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Tab Content */}
-          <div className="mt-8">
-            {activeTab === "lock" ? (
-              <LockTokensForm />
-            ) : (
-              <LocksTable />
-            )}
-          </div>
+          <div className="mt-8">{activeTab === "lock" ? <LockTokensForm /> : <LocksTable />}</div>
         </div>
       </div>
     </main>

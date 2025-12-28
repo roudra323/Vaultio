@@ -15,14 +15,7 @@ export const ConnectWalletButton = () => {
 
   return (
     <ConnectButton.Custom>
-      {({
-        account,
-        chain,
-        openAccountModal,
-        openChainModal,
-        openConnectModal,
-        mounted,
-      }) => {
+      {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
         const ready = mounted;
         const connected = ready && account && chain;
 
@@ -35,18 +28,16 @@ export const ConnectWalletButton = () => {
                 pointerEvents: "none",
                 userSelect: "none",
               },
-            })}
-          >
+            })}>
             {(() => {
               if (!connected) {
                 return (
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-vaultio-purple to-vaultio-cyan text-white font-medium text-sm hover:shadow-lg hover:shadow-vaultio-purple/25 transition-all duration-200"
-                  >
+                    className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/25 flex items-center gap-2 rounded-full bg-gradient-to-r px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:shadow-lg">
                     Connect Wallet
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
                 );
               }
@@ -56,8 +47,7 @@ export const ConnectWalletButton = () => {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-destructive text-white font-medium text-sm"
-                  >
+                    className="bg-destructive flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white">
                     Wrong network
                   </button>
                 );
@@ -66,35 +56,31 @@ export const ConnectWalletButton = () => {
               return (
                 <div className="flex items-center gap-3">
                   {/* Connected wallet display */}
-                  <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-card border border-border">
+                  <div className="bg-card border-border flex items-center gap-3 rounded-full border px-4 py-2">
                     {/* Status indicator */}
-                    <div className="w-2 h-2 rounded-full bg-vaultio-cyan animate-pulse" />
-                    
+                    <div className="bg-vaultio-cyan h-2 w-2 animate-pulse rounded-full" />
+
                     {/* Address */}
-                    <span className="text-sm font-medium text-white">
-                      {account.displayName}
-                    </span>
-                    
+                    <span className="text-sm font-medium text-white">{account.displayName}</span>
+
                     {/* Copy button */}
                     <button
                       onClick={() => copyAddress(account.address)}
-                      className="p-1 hover:bg-secondary rounded transition-colors"
-                      title={copied ? "Copied!" : "Copy address"}
-                    >
-                      <Copy className="w-4 h-4 text-muted-foreground" />
+                      className="hover:bg-secondary rounded p-1 transition-colors"
+                      title={copied ? "Copied!" : "Copy address"}>
+                      <Copy className="text-muted-foreground h-4 w-4" />
                     </button>
                   </div>
 
                   {/* Avatar */}
                   <button
                     onClick={openAccountModal}
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-vaultio-purple to-vaultio-cyan flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-vaultio-cyan transition-all"
-                  >
+                    className="from-vaultio-purple to-vaultio-cyan hover:ring-vaultio-cyan flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br transition-all hover:ring-2">
                     {account.ensAvatar ? (
                       <img
                         alt={account.displayName}
                         src={account.ensAvatar}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <span className="text-lg">🦊</span>
@@ -104,10 +90,9 @@ export const ConnectWalletButton = () => {
                   {/* Disconnect button */}
                   <button
                     onClick={openAccountModal}
-                    className="p-2 hover:bg-secondary rounded-lg transition-colors"
-                    title="Account"
-                  >
-                    <LogOut className="w-5 h-5 text-muted-foreground" />
+                    className="hover:bg-secondary rounded-lg p-2 transition-colors"
+                    title="Account">
+                    <LogOut className="text-muted-foreground h-5 w-5" />
                   </button>
                 </div>
               );

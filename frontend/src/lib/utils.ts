@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 // Vaultio contract custom error mappings
@@ -40,10 +40,7 @@ export const formatTransactionError = (error: unknown): string => {
   }
 
   // Insufficient funds for gas
-  if (
-    errorString.includes("INSUFFICIENT_FUNDS") ||
-    errorString.includes("insufficient funds")
-  ) {
+  if (errorString.includes("INSUFFICIENT_FUNDS") || errorString.includes("insufficient funds")) {
     return "Insufficient funds for gas fees";
   }
 
@@ -56,10 +53,7 @@ export const formatTransactionError = (error: unknown): string => {
   }
 
   // Network errors
-  if (
-    errorString.includes("NETWORK_ERROR") ||
-    errorString.includes("network changed")
-  ) {
+  if (errorString.includes("NETWORK_ERROR") || errorString.includes("network changed")) {
     return "Network error. Please check your connection and try again";
   }
 

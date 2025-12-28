@@ -6,14 +6,12 @@ import { ConnectWalletButton } from "@/components/wallet/ConnectWalletButton";
 
 export const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="fixed top-0 right-0 left-0 z-50 px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="group flex items-center gap-3">
           <VaultioLogo size={36} />
-          <span className="text-xl font-semibold text-white tracking-wide">
-            Vaultio
-          </span>
+          <span className="text-xl font-semibold tracking-wide text-white">Vaultio</span>
         </Link>
 
         {/* Wallet Connection */}

@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Generated files
+*.d.ts
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Public assets
+public/
+

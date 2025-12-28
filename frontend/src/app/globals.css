@@ -6,32 +6,32 @@
 /* Custom Vaultio Theme */
 :root {
   --radius: 0.625rem;
-  
+
   /* Vaultio Dark Theme Colors */
-  --background: #0A0A0B;
-  --foreground: #FFFFFF;
-  --card: #1A1A1D;
-  --card-foreground: #FFFFFF;
-  --popover: #1A1A1D;
-  --popover-foreground: #FFFFFF;
-  --primary: #2DBEE8;
-  --primary-foreground: #FFFFFF;
+  --background: #0a0a0b;
+  --foreground: #ffffff;
+  --card: #1a1a1d;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1d;
+  --popover-foreground: #ffffff;
+  --primary: #2dbee8;
+  --primary-foreground: #ffffff;
   --secondary: #252528;
-  --secondary-foreground: #FFFFFF;
+  --secondary-foreground: #ffffff;
   --muted: #252528;
-  --muted-foreground: #9CA3AF;
+  --muted-foreground: #9ca3af;
   --accent: #252528;
-  --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --border: #2A2A2D;
-  --input: #1A1A1D;
-  --ring: #2DBEE8;
-  
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #2a2a2d;
+  --input: #1a1a1d;
+  --ring: #2dbee8;
+
   /* Vaultio Brand Colors from Figma */
-  --vaultio-purple: #7F22FE;
-  --vaultio-cyan: #2DBEE8;
-  --vaultio-purple-dark: #6B1DD6;
-  --vaultio-cyan-dark: #25A5CC;
+  --vaultio-purple: #7f22fe;
+  --vaultio-cyan: #2dbee8;
+  --vaultio-purple-dark: #6b1dd6;
+  --vaultio-cyan-dark: #25a5cc;
   --vaultio-card-border: rgba(255, 255, 255, 0.08);
   --vaultio-glow: rgba(45, 190, 232, 0.3);
   --vaultio-glow-purple: rgba(127, 34, 254, 0.3);
@@ -65,7 +65,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  
+
   /* Custom Vaultio colors for Tailwind */
   --color-vaultio-purple: var(--vaultio-purple);
   --color-vaultio-cyan: var(--vaultio-cyan);
@@ -79,11 +79,11 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   html {
     color-scheme: dark;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     background: var(--background);
@@ -99,130 +99,141 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .gradient-text-reverse {
     background: linear-gradient(90deg, var(--vaultio-cyan), var(--vaultio-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   /* Gradient Backgrounds - matching Figma */
   .gradient-bg {
-    background: radial-gradient(111.58% 100% at 50% 0%, #7F22FE 0%, #2DBEE8 100%);
+    background: radial-gradient(111.58% 100% at 50% 0%, #7f22fe 0%, #2dbee8 100%);
   }
-  
+
   .gradient-bg-linear {
     background: linear-gradient(135deg, var(--vaultio-purple), var(--vaultio-cyan));
   }
-  
+
   .gradient-border {
     position: relative;
     background: var(--card);
     border-radius: var(--radius-lg);
   }
-  
+
   .gradient-border::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     padding: 1px;
     border-radius: inherit;
     background: linear-gradient(135deg, rgba(127, 34, 254, 0.4), rgba(45, 190, 232, 0.4));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
   }
-  
+
   /* Glow Effects */
   .glow-cyan {
-    box-shadow: 0 0 20px var(--vaultio-glow), 0 0 40px rgba(45, 190, 232, 0.15);
+    box-shadow:
+      0 0 20px var(--vaultio-glow),
+      0 0 40px rgba(45, 190, 232, 0.15);
   }
-  
+
   .glow-purple {
-    box-shadow: 0 0 20px var(--vaultio-glow-purple), 0 0 40px rgba(127, 34, 254, 0.15);
+    box-shadow:
+      0 0 20px var(--vaultio-glow-purple),
+      0 0 40px rgba(127, 34, 254, 0.15);
   }
-  
+
   .glow-button {
     box-shadow: 0 4px 14px 0 rgba(45, 190, 232, 0.39);
   }
-  
+
   /* Card Styles */
   .vaultio-card {
     background: var(--card);
     border: 1px solid var(--vaultio-card-border);
     border-radius: var(--radius-lg);
   }
-  
+
   /* Button Gradient - Purple to Cyan */
   .btn-gradient {
     background: linear-gradient(135deg, var(--vaultio-purple), var(--vaultio-cyan));
     transition: all 0.2s ease;
   }
-  
+
   .btn-gradient:hover {
     background: linear-gradient(135deg, var(--vaultio-purple-dark), var(--vaultio-cyan-dark));
     box-shadow: 0 4px 20px rgba(127, 34, 254, 0.4);
   }
-  
+
   /* Table Styles */
   .vaultio-table {
     border: 1px solid var(--vaultio-card-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
   }
-  
+
   /* Status Badge */
   .status-locked {
     color: var(--vaultio-cyan);
     border-color: var(--vaultio-cyan);
   }
-  
+
   .status-withdrawn {
     color: var(--muted-foreground);
     border-color: var(--muted-foreground);
   }
-  
+
   /* Floating Elements Animation */
   @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0) rotate(0deg);
     }
     50% {
       transform: translateY(-10px) rotate(3deg);
     }
   }
-  
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
-  
+
   @keyframes float-delayed {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0) rotate(0deg);
     }
     50% {
       transform: translateY(-15px) rotate(-3deg);
     }
   }
-  
+
   .animate-float-delayed {
     animation: float-delayed 8s ease-in-out infinite;
     animation-delay: 2s;
   }
-  
+
   /* Subtle pulse for decorative elements */
   @keyframes subtle-pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.6;
     }
     50% {
       opacity: 1;
     }
   }
-  
+
   .animate-subtle-pulse {
     animation: subtle-pulse 3s ease-in-out infinite;
   }
