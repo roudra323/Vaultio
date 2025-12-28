@@ -8,16 +8,20 @@ const main = async () => {
     const [deployer] = await ethers.getSigners();
     console.log("Deploying MockERC20 with account:", deployer.address);
 
-    // Get token name and symbol from environment or use defaults
+    // Get token name, symbol, and decimals from environment or use defaults
     const tokenName = process.env.TOKEN_NAME || "Mock Token";
     const tokenSymbol = process.env.TOKEN_SYMBOL || "MTK";
+    const tokenDecimals = process.env.TOKEN_DECIMALS
+        ? parseInt(process.env.TOKEN_DECIMALS, 10)
+        : 6; // Default to 6 decimals (like USDT/USDC)
 
     console.log(`Token Name: ${tokenName}`);
     console.log(`Token Symbol: ${tokenSymbol}`);
+    console.log(`Token Decimals: ${tokenDecimals}`);
 
     // Deploy MockERC20
     const MockERC20 = await ethers.getContractFactory("MockERC20");
-    const mockToken = await MockERC20.deploy(tokenName, tokenSymbol);
+    const mockToken = await MockERC20.deploy(tokenName, tokenSymbol, tokenDecimals);
     await mockToken.waitForDeployment();
 
     const tokenAddress = await mockToken.getAddress();
@@ -28,6 +32,7 @@ const main = async () => {
         address: tokenAddress,
         name: tokenName,
         symbol: tokenSymbol,
+        decimals: tokenDecimals,
         deployer: deployer.address,
         deployedAt: new Date().toISOString(),
     };

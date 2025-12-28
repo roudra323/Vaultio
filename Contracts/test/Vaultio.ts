@@ -18,9 +18,9 @@ describe("Vaultio", function () {
     beforeEach(async function () {
         [owner, user1, user2] = await ethers.getSigners();
 
-        // Deploy mock ERC20 token
+        // Deploy mock ERC20 token with 18 decimals
         const MockERC20Factory = await ethers.getContractFactory("MockERC20");
-        mockToken = await MockERC20Factory.deploy("Mock Token", "MTK");
+        mockToken = await MockERC20Factory.deploy("Mock Token", "MTK", 18);
         await mockToken.waitForDeployment();
 
         // Deploy Vaultio
