@@ -9,16 +9,23 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useVaultio, type Lock } from "@/hooks/useVaultio";
-import { formatUnits } from "viem";
+import { ethers } from "ethers";
 
 type WithdrawModalProps = {
   lock: Lock;
   lockIndex: number;
   isOpen: boolean;
   onClose: () => void;
+  decimals: number;
 };
 
-export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModalProps) => {
+export const WithdrawModal = ({
+  lock,
+  lockIndex,
+  isOpen,
+  onClose,
+  decimals,
+}: WithdrawModalProps) => {
   const { withdrawTokens, isWithdrawing } = useVaultio();
 
   const shortenAddress = (addr: string) => {
@@ -56,7 +63,9 @@ export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModa
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Amount</span>
-            <span className="font-medium text-white">{formatUnits(lock.amount, 18)}</span>
+            <span className="font-medium text-white">
+              {ethers.utils.formatUnits(lock.amount, decimals)}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Address</span>

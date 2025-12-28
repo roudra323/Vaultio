@@ -19,6 +19,7 @@ export const useVaultio = () => {
     // Data
     userLocks: context.userLocks,
     isLoadingLocks: context.isLoadingLocks,
+    tokenDecimals: context.tokenDecimals,
 
     // Transaction states
     isApproving: context.isApproving,
@@ -27,6 +28,7 @@ export const useVaultio = () => {
     needsApproval: true, // Will be determined by checkAllowance
 
     // Actions
+    getDecimals: context.getDecimals,
     checkAllowance: context.checkAllowance,
     approveTokens: context.approveTokens,
     lockTokens: context.lockTokens,

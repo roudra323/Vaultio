@@ -75,4 +75,23 @@ export const formatTokenAmount = (amount: ethers.BigNumber, decimals: number = 1
   return ethers.utils.formatUnits(amount, decimals);
 };
 
+/**
+ * Fetch token decimals from an ERC20 contract
+ * Returns the decimal count (typically 6, 8, or 18)
+ * Defaults to 18 if the call fails (for non-standard tokens)
+ */
+export const getTokenDecimals = async (
+  tokenAddress: string,
+  signer: ethers.Signer
+): Promise<number> => {
+  try {
+    const tokenContract = getERC20Contract(tokenAddress, signer);
+    const decimals = await tokenContract.decimals();
+    return decimals;
+  } catch (error) {
+    console.warn(`Failed to fetch decimals for token ${tokenAddress}, defaulting to 18:`, error);
+    return 18;
+  }
+};
+
 export type { ethers };

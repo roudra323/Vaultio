@@ -16,7 +16,7 @@ import { useVaultio, type Lock } from "@/hooks/useVaultio";
 import { ethers } from "ethers";
 
 export const LocksTable = () => {
-  const { userLocks, isLoadingLocks } = useVaultio();
+  const { userLocks, isLoadingLocks, tokenDecimals } = useVaultio();
   const [selectedLock, setSelectedLock] = useState<{
     lock: Lock;
     index: number;
@@ -54,6 +54,11 @@ export const LocksTable = () => {
 
   const isUnlocked = (unlockTime: ethers.BigNumber) => {
     return currentTime >= unlockTime.toNumber() * 1000;
+  };
+
+  const getDecimalsForToken = (tokenAddress: string): number => {
+    const normalizedAddress = tokenAddress.toLowerCase();
+    return tokenDecimals[normalizedAddress] ?? 18;
   };
 
   const handleWithdrawClick = (lock: Lock, index: number) => {
@@ -96,7 +101,8 @@ export const LocksTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {userLocks.map((lock, index) => {
+            {[...userLocks].reverse().map((lock, reversedIndex) => {
+              const index = userLocks.length - 1 - reversedIndex;
               const unlocked = isUnlocked(lock.unlockTime);
               const canWithdraw = unlocked && !lock.withdrawn;
 
@@ -106,7 +112,7 @@ export const LocksTable = () => {
                     {shortenAddress(lock.token)}
                   </TableCell>
                   <TableCell className="text-white">
-                    {ethers.utils.formatUnits(lock.amount, 18)}
+                    {ethers.utils.formatUnits(lock.amount, getDecimalsForToken(lock.token))}
                   </TableCell>
                   <TableCell className="text-white">{formatDate(lock.startTime)}</TableCell>
                   <TableCell className="text-white">{formatDate(lock.unlockTime)}</TableCell>
@@ -146,6 +152,7 @@ export const LocksTable = () => {
           lockIndex={selectedLock.index}
           isOpen={!!selectedLock}
           onClose={handleCloseModal}
+          decimals={getDecimalsForToken(selectedLock.lock.token)}
         />
       )}
     </>

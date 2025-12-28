@@ -16,6 +16,7 @@ import {
   getVaultioContract,
   getERC20Contract,
   parseTokenAmount,
+  getTokenDecimals,
 } from "@/lib/ethers";
 import { formatTransactionError } from "@/lib/utils";
 import { VAULTIO_ADDRESS } from "@/lib/contracts";
@@ -35,6 +36,7 @@ type VaultioContextState = {
   // Data
   userLocks: Lock[];
   isLoadingLocks: boolean;
+  tokenDecimals: Record<string, number>;
 
   // Transaction states
   isApproving: boolean;
@@ -43,6 +45,7 @@ type VaultioContextState = {
 
   // Actions
   fetchUserLocks: () => Promise<void>;
+  getDecimals: (tokenAddress: string) => Promise<number>;
   checkAllowance: (tokenAddress: string, amount: string) => Promise<boolean>;
   approveTokens: (tokenAddress: string, amount: string) => Promise<boolean>;
   lockTokens: (tokenAddress: string, amount: string, durationInMinutes: number) => Promise<boolean>;
@@ -67,6 +70,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
   const [isApproving, setIsApproving] = useState(false);
   const [isLocking, setIsLocking] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [tokenDecimals, setTokenDecimals] = useState<Record<string, number>>({});
 
   // Get signer from wallet client
   const getSigner = useCallback(() => {
@@ -75,6 +79,40 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     }
     return walletClientToSigner(walletClient);
   }, [walletClient]);
+
+  // Get token decimals with caching
+  const getDecimals = useCallback(
+    async (tokenAddress: string): Promise<number> => {
+      const normalizedAddress = tokenAddress.toLowerCase();
+
+      // Check cache first
+      if (tokenDecimals[normalizedAddress] !== undefined) {
+        return tokenDecimals[normalizedAddress];
+      }
+
+      // Fetch from contract if not cached
+      if (!walletClient) {
+        return 18; // Default to 18 if no wallet connected
+      }
+
+      try {
+        const signer = getSigner();
+        const decimals = await getTokenDecimals(tokenAddress, signer);
+
+        // Update cache
+        setTokenDecimals((prev) => ({
+          ...prev,
+          [normalizedAddress]: decimals,
+        }));
+
+        return decimals;
+      } catch (error) {
+        console.error("Error fetching token decimals:", error);
+        return 18; // Default to 18 on error
+      }
+    },
+    [tokenDecimals, walletClient, getSigner]
+  );
 
   // Fetch user locks
   const fetchUserLocks = useCallback(async () => {
@@ -99,13 +137,32 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       }));
 
       setUserLocks(formattedLocks);
+
+      // Fetch decimals for all unique tokens in locks
+      const uniqueTokens = [...new Set(formattedLocks.map((lock) => lock.token.toLowerCase()))];
+      const decimalsToFetch = uniqueTokens.filter((token) => tokenDecimals[token] === undefined);
+
+      if (decimalsToFetch.length > 0) {
+        const decimalsPromises = decimalsToFetch.map(async (token) => {
+          const decimals = await getTokenDecimals(token, signer);
+          return { token, decimals };
+        });
+
+        const results = await Promise.all(decimalsPromises);
+        const newDecimals: Record<string, number> = {};
+        results.forEach(({ token, decimals }) => {
+          newDecimals[token] = decimals;
+        });
+
+        setTokenDecimals((prev) => ({ ...prev, ...newDecimals }));
+      }
     } catch (error) {
       console.error("Error fetching user locks:", error);
       setUserLocks([]);
     } finally {
       setIsLoadingLocks(false);
     }
-  }, [address, walletClient, getSigner]);
+  }, [address, walletClient, getSigner, tokenDecimals]);
 
   // Fetch locks when wallet connects or address changes
   useEffect(() => {
@@ -125,7 +182,17 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
         const signer = getSigner();
         const tokenContract = getERC20Contract(tokenAddress, signer);
         const allowance = await tokenContract.allowance(address, VAULTIO_ADDRESS);
-        const amountInWei = parseTokenAmount(amount);
+
+        // Get token decimals dynamically
+        const decimals = await getDecimals(tokenAddress);
+        const amountInWei = parseTokenAmount(amount, decimals);
+
+        console.log("allowance", allowance.toString());
+        console.log("amountInWei", amountInWei.toString());
+        console.log("decimals", decimals);
+        console.log("Contract Address", VAULTIO_ADDRESS);
+        console.log("Token Address", tokenAddress);
+        console.log("Address", address);
 
         return allowance.lt(amountInWei);
       } catch (error) {
@@ -133,7 +200,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
         return true;
       }
     },
-    [address, walletClient, getSigner]
+    [address, walletClient, getSigner, getDecimals]
   );
 
   // Approve tokens
@@ -148,7 +215,10 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       try {
         const signer = getSigner();
         const tokenContract = getERC20Contract(tokenAddress, signer);
-        const amountInWei = parseTokenAmount(amount);
+
+        // Get token decimals dynamically
+        const decimals = await getDecimals(tokenAddress);
+        const amountInWei = parseTokenAmount(amount, decimals);
 
         const tx = await tokenContract.approve(VAULTIO_ADDRESS, amountInWei);
         toast.loading("Approving tokens...", { id: "approve" });
@@ -164,7 +234,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
         setIsApproving(false);
       }
     },
-    [address, walletClient, getSigner]
+    [address, walletClient, getSigner, getDecimals]
   );
 
   // Lock tokens
@@ -179,7 +249,10 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       try {
         const signer = getSigner();
         const vaultioContract = getVaultioContract(signer);
-        const amountInWei = parseTokenAmount(amount);
+
+        // Get token decimals dynamically
+        const decimals = await getDecimals(tokenAddress);
+        const amountInWei = parseTokenAmount(amount, decimals);
 
         const tx = await vaultioContract.lockTokens(tokenAddress, amountInWei, durationInMinutes);
 
@@ -198,7 +271,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
         setIsLocking(false);
       }
     },
-    [address, walletClient, getSigner, fetchUserLocks]
+    [address, walletClient, getSigner, fetchUserLocks, getDecimals]
   );
 
   // Withdraw tokens
@@ -239,10 +312,12 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     () => ({
       userLocks,
       isLoadingLocks,
+      tokenDecimals,
       isApproving,
       isLocking,
       isWithdrawing,
       fetchUserLocks,
+      getDecimals,
       checkAllowance,
       approveTokens,
       lockTokens,
@@ -251,10 +326,12 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     [
       userLocks,
       isLoadingLocks,
+      tokenDecimals,
       isApproving,
       isLocking,
       isWithdrawing,
       fetchUserLocks,
+      getDecimals,
       checkAllowance,
       approveTokens,
       lockTokens,
