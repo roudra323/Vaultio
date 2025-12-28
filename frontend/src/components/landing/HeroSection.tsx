@@ -45,7 +45,7 @@ export const HeroSection = () => {
           {isConnected ? (
             <button
               onClick={handleGetStarted}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-vaultio-purple to-vaultio-cyan text-white font-semibold text-base hover:shadow-lg hover:shadow-vaultio-purple/30 transition-all duration-300 transform hover:scale-105"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-linear-to-r from-vaultio-purple to-vaultio-cyan text-white font-semibold text-base hover:shadow-lg hover:shadow-vaultio-purple/30 transition-all duration-300 transform hover:scale-105"
             >
               Go to Dashboard
               <ChevronRight className="w-5 h-5" />
@@ -57,7 +57,7 @@ export const HeroSection = () => {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
     </section>
   );
 };
