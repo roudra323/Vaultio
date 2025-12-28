@@ -11,7 +11,7 @@ import { LocksTable } from "@/components/dashboard/LocksTable";
 const DashboardPage = () => {
   const { address, isConnected } = useAccount();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"lock" | "locks">("lock");
+  const [activeTab, setActiveTab] = useState<"lock" | "locks">("locks");
 
   useEffect(() => {
     if (!isConnected) {
