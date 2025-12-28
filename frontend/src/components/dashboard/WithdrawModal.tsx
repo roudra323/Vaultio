@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -40,9 +40,7 @@ export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModa
             <DialogTitle className="text-xl font-semibold text-white">Withdraw Tokens</DialogTitle>
             <button
               onClick={onClose}
-              className="hover:bg-secondary rounded-lg p-1 transition-colors">
-              <X className="text-muted-foreground h-5 w-5" />
-            </button>
+              className="hover:bg-secondary rounded-lg p-1 transition-colors"></button>
           </div>
           <DialogDescription className="text-muted-foreground">
             You are about to withdraw your locked tokens. This action will transfer the assets back
