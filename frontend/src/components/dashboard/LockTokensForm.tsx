@@ -13,7 +13,9 @@ import {
 import { useVaultio } from "@/hooks/useVaultio";
 import { Loader2 } from "lucide-react";
 
+// Convert Chosen Duration to Minutes for the contract
 const DURATION_OPTIONS = [
+  { label: "1 min", value: "1" },
   { label: "10 mins", value: "10" },
   { label: "30 mins", value: "30" },
   { label: "1 hour", value: "60" },
@@ -27,7 +29,7 @@ const DURATION_OPTIONS = [
 export const LockTokensForm = () => {
   const [tokenAddress, setTokenAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [duration, setDuration] = useState("10");
+  const [duration, setDuration] = useState("1");
   const [step, setStep] = useState<"approve" | "lock">("approve");
   const [isApproved, setIsApproved] = useState(false);
 
@@ -197,7 +199,7 @@ export const LockTokensForm = () => {
           <button
             type="submit"
             disabled={isLoading || !isValid}
-            className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/30 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r py-4 text-base font-semibold text-white transition-all duration-200 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
+            className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/30 flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r py-4 text-base font-semibold text-white transition-all duration-200 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
             {isLoading && <Loader2 className="h-5 w-5 animate-spin" />}
             {buttonText}
           </button>
