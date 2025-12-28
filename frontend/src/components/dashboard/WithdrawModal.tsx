@@ -8,8 +8,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useVaultio, type Lock } from "@/hooks/useVaultio";
-import { formatUnits } from "viem";
+import { useVaultio } from "@/hooks/useVaultio";
+import { formatAddress, formatTokenAmount } from "@/lib/utils";
+import type { Lock } from "@/types";
 
 type WithdrawModalProps = {
   lock: Lock;
@@ -18,12 +19,13 @@ type WithdrawModalProps = {
   onClose: () => void;
 };
 
-export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModalProps) => {
+export const WithdrawModal = ({
+  lock,
+  lockIndex,
+  isOpen,
+  onClose,
+}: WithdrawModalProps) => {
   const { withdrawTokens, isWithdrawing } = useVaultio();
-
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   const handleConfirmWithdraw = async () => {
     const success = await withdrawTokens(lockIndex);
@@ -48,7 +50,8 @@ export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModa
             </button>
           </div>
           <DialogDescription className="text-muted-foreground">
-            You are about to withdraw your locked tokens. This action will transfer the assets back to your wallet.
+            You are about to withdraw your locked tokens. This action will
+            transfer the assets back to your wallet.
           </DialogDescription>
         </DialogHeader>
 
@@ -61,13 +64,13 @@ export const WithdrawModal = ({ lock, lockIndex, isOpen, onClose }: WithdrawModa
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Amount</span>
             <span className="text-white font-medium">
-              {formatUnits(lock.amount, 18)}
+              {formatTokenAmount(lock.amount)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Address</span>
             <span className="text-white font-medium font-mono">
-              {shortenAddress(lock.token)}
+              {formatAddress(lock.token)}
             </span>
           </div>
         </div>

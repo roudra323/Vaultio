@@ -1,106 +1,97 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { ethers } from "ethers";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
-// Vaultio contract custom error mappings
-const VAULTIO_CUSTOM_ERRORS: Record<string, string> = {
-  InvalidTokenAddress: "Invalid token address provided",
-  InvalidAmount: "Amount must be greater than zero",
-  InvalidDuration: "Lock duration must be greater than zero",
-  InsufficientTokenBalance: "You don't have enough tokens in your wallet",
-  InsufficientTokenAllowance: "Please approve tokens before locking",
-  InvalidLockId: "Lock not found",
-  TokensAlreadyWithdrawn: "These tokens have already been withdrawn",
-  LockPeriodNotExpired: "Lock period has not expired yet",
-  CallerIsNotAnWalletAddress: "Only wallet addresses can interact with this contract",
+/**
+ * Merge Tailwind CSS classes with clsx
+ */
+export const cn = (...inputs: ClassValue[]) => {
+  return twMerge(clsx(inputs));
 };
 
-// Format ethers.js and wallet errors into user-friendly messages
-export const formatTransactionError = (error: unknown): string => {
-  const errorString = error instanceof Error ? error.message : String(error);
-
-  // User rejected transaction
-  if (
-    errorString.includes("ACTION_REJECTED") ||
-    errorString.includes("user rejected") ||
-    errorString.includes("User denied") ||
-    errorString.includes("User rejected")
-  ) {
-    return "Transaction cancelled by user";
+/**
+ * Format an Ethereum address for display (e.g., 0x1234...5678)
+ */
+export const formatAddress = (address: string, prefixLength = 6, suffixLength = 4): string => {
+  if (!address || address.length < prefixLength + suffixLength) {
+    return address;
   }
-
-  // Check for Vaultio custom errors
-  for (const [errorName, friendlyMessage] of Object.entries(VAULTIO_CUSTOM_ERRORS)) {
-    if (errorString.includes(errorName)) {
-      return friendlyMessage;
-    }
-  }
-
-  // Insufficient funds for gas
-  if (
-    errorString.includes("INSUFFICIENT_FUNDS") ||
-    errorString.includes("insufficient funds")
-  ) {
-    return "Insufficient funds for gas fees";
-  }
-
-  // Unpredictable gas limit (transaction would fail)
-  if (
-    errorString.includes("UNPREDICTABLE_GAS_LIMIT") ||
-    errorString.includes("cannot estimate gas")
-  ) {
-    return "Transaction would fail. Please check your inputs and try again";
-  }
-
-  // Network errors
-  if (
-    errorString.includes("NETWORK_ERROR") ||
-    errorString.includes("network changed")
-  ) {
-    return "Network error. Please check your connection and try again";
-  }
-
-  // Nonce errors
-  if (errorString.includes("NONCE_EXPIRED") || errorString.includes("nonce")) {
-    return "Transaction nonce error. Please try again";
-  }
-
-  // Timeout errors
-  if (errorString.includes("TIMEOUT") || errorString.includes("timeout")) {
-    return "Transaction timed out. Please try again";
-  }
-
-  // Contract revert errors - try to extract the reason
-  if (errorString.includes("reverted") || errorString.includes("revert")) {
-    const reasonMatch = errorString.match(/reason="([^"]+)"/);
-    if (reasonMatch) {
-      return `Transaction failed: ${reasonMatch[1]}`;
-    }
-    return "Transaction reverted. Please check your inputs";
-  }
-
-  // Allowance/approval specific errors
-  if (errorString.includes("allowance") || errorString.includes("Allowance")) {
-    return "Insufficient token allowance. Please approve tokens first";
-  }
-
-  // Balance errors
-  if (
-    errorString.includes("transfer amount exceeds balance") ||
-    errorString.includes("exceeds balance")
-  ) {
-    return "Insufficient token balance";
-  }
-
-  // If we can't identify the error, return a generic but clean message
-  // Try to extract a simple message if possible
-  const simpleMessageMatch = errorString.match(/reason="([^"]+)"/);
-  if (simpleMessageMatch) {
-    return simpleMessageMatch[1];
-  }
-
-  return "Transaction failed. Please try again";
+  return `${address.slice(0, prefixLength)}...${address.slice(-suffixLength)}`;
 };
+
+/**
+ * Format a BigNumber amount to a human-readable string
+ */
+export const formatTokenAmount = (
+  amount: ethers.BigNumber,
+  decimals: number = 18
+): string => {
+  return ethers.utils.formatUnits(amount, decimals);
+};
+
+/**
+ * Parse a string amount to BigNumber
+ */
+export const parseTokenAmount = (
+  amount: string,
+  decimals: number = 18
+): ethers.BigNumber => {
+  return ethers.utils.parseUnits(amount, decimals);
+};
+
+/**
+ * Format a Unix timestamp to a readable date string
+ */
+export const formatDate = (timestamp: ethers.BigNumber | number): string => {
+  const ts = typeof timestamp === "number" ? timestamp : timestamp.toNumber();
+  const date = new Date(ts * 1000);
+
+  return (
+    date.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "2-digit",
+    }) +
+    " | " +
+    date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+  );
+};
+
+/**
+ * Check if a lock is unlocked based on current time
+ */
+export const isUnlocked = (unlockTime: ethers.BigNumber | number): boolean => {
+  const unlockTs =
+    typeof unlockTime === "number" ? unlockTime : unlockTime.toNumber();
+  return Date.now() >= unlockTs * 1000;
+};
+
+/**
+ * Format a number with commas for thousands
+ */
+export const formatNumber = (value: number | string): string => {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  return new Intl.NumberFormat("en-US").format(num);
+};
+
+/**
+ * Validate an Ethereum address
+ */
+export const isValidAddress = (address: string): boolean => {
+  return ethers.utils.isAddress(address);
+};
+
+/**
+ * Truncate a string to a maximum length
+ */
+export const truncateString = (str: string, maxLength: number): string => {
+  if (str.length <= maxLength) return str;
+  return `${str.slice(0, maxLength - 3)}...`;
+};
+
+// Re-export error formatting
+export { formatTransactionError, isTransactionError } from "./errors";

@@ -11,24 +11,19 @@ import {
 } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { toast } from "sonner";
+import { walletClientToSigner } from "@/lib/ethers";
+import { formatTransactionError } from "@/lib/errors";
+import { VAULTIO_ADDRESS } from "@/constants";
 import {
-  walletClientToSigner,
-  getVaultioContract,
-  getERC20Contract,
-  parseTokenAmount,
-} from "@/lib/ethers";
-import { formatTransactionError } from "@/lib/utils";
-import { VAULTIO_ADDRESS } from "@/lib/contracts";
-import type { ethers } from "ethers";
-
-// Lock type using Ethers BigNumber
-export type Lock = {
-  token: string;
-  amount: ethers.BigNumber;
-  startTime: ethers.BigNumber;
-  unlockTime: ethers.BigNumber;
-  withdrawn: boolean;
-};
+  getUserLocks as fetchLocks,
+  lockTokens as lockTokensService,
+  withdrawTokens as withdrawTokensService,
+} from "@/services/vaultio.service";
+import {
+  checkNeedsApproval,
+  approveTokens as approveTokensService,
+} from "@/services/erc20.service";
+import type { Lock } from "@/types";
 
 // Context state type
 type VaultioContextState = {
@@ -92,19 +87,8 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     setIsLoadingLocks(true);
     try {
       const signer = getSigner();
-      const vaultioContract = getVaultioContract(signer);
-      const locks = await vaultioContract.getUserLocks(address);
-
-      // Convert the array of structs to our Lock type
-      const formattedLocks: Lock[] = locks.map((lock: Lock) => ({
-        token: lock.token,
-        amount: lock.amount,
-        startTime: lock.startTime,
-        unlockTime: lock.unlockTime,
-        withdrawn: lock.withdrawn,
-      }));
-
-      setUserLocks(formattedLocks);
+      const locks = await fetchLocks(address, signer);
+      setUserLocks(locks);
     } catch (error) {
       console.error("Error fetching user locks:", error);
       setUserLocks([]);
@@ -129,14 +113,13 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
 
       try {
         const signer = getSigner();
-        const tokenContract = getERC20Contract(tokenAddress, signer);
-        const allowance = await tokenContract.allowance(
+        return await checkNeedsApproval(
+          tokenAddress,
           address,
-          VAULTIO_ADDRESS
+          VAULTIO_ADDRESS,
+          amount,
+          signer
         );
-        const amountInWei = parseTokenAmount(amount);
-
-        return allowance.lt(amountInWei);
       } catch (error) {
         console.error("Error checking allowance:", error);
         return true;
@@ -156,12 +139,14 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       setIsApproving(true);
       try {
         const signer = getSigner();
-        const tokenContract = getERC20Contract(tokenAddress, signer);
-        const amountInWei = parseTokenAmount(amount);
+        const tx = await approveTokensService(
+          tokenAddress,
+          VAULTIO_ADDRESS,
+          amount,
+          signer
+        );
 
-        const tx = await tokenContract.approve(VAULTIO_ADDRESS, amountInWei);
         toast.loading("Approving tokens...", { id: "approve" });
-
         await tx.wait();
         toast.success("Token approved successfully", { id: "approve" });
 
@@ -191,13 +176,11 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       setIsLocking(true);
       try {
         const signer = getSigner();
-        const vaultioContract = getVaultioContract(signer);
-        const amountInWei = parseTokenAmount(amount);
-
-        const tx = await vaultioContract.lockTokens(
+        const tx = await lockTokensService(
           tokenAddress,
-          amountInWei,
-          durationInMinutes
+          amount,
+          durationInMinutes,
+          signer
         );
 
         toast.loading("Locking tokens...", { id: "lock" });
@@ -229,9 +212,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       setIsWithdrawing(true);
       try {
         const signer = getSigner();
-        const vaultioContract = getVaultioContract(signer);
-
-        const tx = await vaultioContract.withdrawTokens(lockId);
+        const tx = await withdrawTokensService(lockId, signer);
 
         toast.loading("Withdrawing tokens...", { id: "withdraw" });
         await tx.wait();

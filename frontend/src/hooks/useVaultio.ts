@@ -1,16 +1,17 @@
 "use client";
 
-import { useVaultioContext, type Lock } from "@/contexts/VaultioContext";
+import { useVaultioContext } from "@/contexts/VaultioContext";
+import type { Lock } from "@/types";
 
 /**
  * Custom hook to interact with the Vaultio contract
- * 
+ *
  * This hook provides access to the VaultioContext which manages:
- * - Contract interactions using Ethers v5
+ * - Contract interactions through the service layer
  * - State management for locks, loading states, and transaction states
- * 
+ *
  * The context uses Wagmi's WalletClient for wallet connection
- * but Ethers v5 for all contract interactions
+ * and services with Ethers v5 for contract interactions
  */
 export const useVaultio = () => {
   const context = useVaultioContext();
@@ -24,7 +25,6 @@ export const useVaultio = () => {
     isApproving: context.isApproving,
     isLocking: context.isLocking,
     isWithdrawing: context.isWithdrawing,
-    needsApproval: true, // Will be determined by checkAllowance
 
     // Actions
     checkAllowance: context.checkAllowance,
@@ -35,5 +35,5 @@ export const useVaultio = () => {
   };
 };
 
-// Re-export the Lock type for backwards compatibility
+// Re-export the Lock type for convenience
 export type { Lock };

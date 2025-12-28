@@ -11,23 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useVaultio } from "@/hooks/useVaultio";
+import { DURATION_OPTIONS, DEFAULT_DURATION } from "@/constants";
 import { Loader2 } from "lucide-react";
-
-const DURATION_OPTIONS = [
-  { label: "10 mins", value: "10" },
-  { label: "30 mins", value: "30" },
-  { label: "1 hour", value: "60" },
-  { label: "6 hours", value: "360" },
-  { label: "12 hours", value: "720" },
-  { label: "1 day", value: "1440" },
-  { label: "7 days", value: "10080" },
-  { label: "30 days", value: "43200" },
-];
 
 export const LockTokensForm = () => {
   const [tokenAddress, setTokenAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [duration, setDuration] = useState("10");
+  const [duration, setDuration] = useState(DEFAULT_DURATION);
   const [step, setStep] = useState<"approve" | "lock">("approve");
   const [isApproved, setIsApproved] = useState(false);
 
@@ -72,7 +62,7 @@ export const LockTokensForm = () => {
       // Reset form
       setTokenAddress("");
       setAmount("");
-      setDuration("10");
+      setDuration(DEFAULT_DURATION);
       setStep("approve");
       setIsApproved(false);
     }
@@ -80,7 +70,7 @@ export const LockTokensForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (step === "approve") {
       await handleApprove();
     } else {
@@ -90,7 +80,7 @@ export const LockTokensForm = () => {
 
   const isLoading = isApproving || isLocking;
   const isValid = tokenAddress && amount && parseFloat(amount) > 0;
-  
+
   const buttonText = isApproving
     ? "Approving..."
     : isLocking
@@ -105,7 +95,10 @@ export const LockTokensForm = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Token Address */}
           <div className="space-y-2">
-            <Label htmlFor="tokenAddress" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            <Label
+              htmlFor="tokenAddress"
+              className="text-sm font-medium text-muted-foreground uppercase tracking-wide"
+            >
               Token Address
             </Label>
             <Input
@@ -122,7 +115,10 @@ export const LockTokensForm = () => {
           <div className="grid grid-cols-2 gap-4">
             {/* Amount */}
             <div className="space-y-2">
-              <Label htmlFor="amount" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              <Label
+                htmlFor="amount"
+                className="text-sm font-medium text-muted-foreground uppercase tracking-wide"
+              >
                 Amount
               </Label>
               <Input
@@ -139,7 +135,10 @@ export const LockTokensForm = () => {
 
             {/* Duration */}
             <div className="space-y-2">
-              <Label htmlFor="duration" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              <Label
+                htmlFor="duration"
+                className="text-sm font-medium text-muted-foreground uppercase tracking-wide"
+              >
                 Duration
               </Label>
               <Select value={duration} onValueChange={setDuration}>
@@ -164,19 +163,37 @@ export const LockTokensForm = () => {
           {/* Progress indicator */}
           {isValid && (
             <div className="flex items-center gap-4 text-sm">
-              <div className={`flex items-center gap-2 ${step === "approve" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  isApproved ? "bg-vaultio-cyan text-white" : step === "approve" ? "border-2 border-vaultio-cyan" : "border border-muted-foreground"
-                }`}>
+              <div
+                className={`flex items-center gap-2 ${
+                  step === "approve" ? "text-vaultio-cyan" : "text-muted-foreground"
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    isApproved
+                      ? "bg-vaultio-cyan text-white"
+                      : step === "approve"
+                      ? "border-2 border-vaultio-cyan"
+                      : "border border-muted-foreground"
+                  }`}
+                >
                   {isApproved ? "✓" : "1"}
                 </div>
                 <span>Approve</span>
               </div>
               <div className="flex-1 h-px bg-border" />
-              <div className={`flex items-center gap-2 ${step === "lock" ? "text-vaultio-cyan" : "text-muted-foreground"}`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  step === "lock" ? "border-2 border-vaultio-cyan" : "border border-muted-foreground"
-                }`}>
+              <div
+                className={`flex items-center gap-2 ${
+                  step === "lock" ? "text-vaultio-cyan" : "text-muted-foreground"
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    step === "lock"
+                      ? "border-2 border-vaultio-cyan"
+                      : "border border-muted-foreground"
+                  }`}
+                >
                   2
                 </div>
                 <span>Lock</span>

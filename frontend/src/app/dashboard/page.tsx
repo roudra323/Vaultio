@@ -7,6 +7,7 @@ import { Header } from "@/components/layout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { LockTokensForm } from "@/components/dashboard/LockTokensForm";
 import { LocksTable } from "@/components/dashboard/LocksTable";
+import { formatAddress } from "@/lib/utils";
 
 const DashboardPage = () => {
   const { address, isConnected } = useAccount();
@@ -19,10 +20,6 @@ const DashboardPage = () => {
     }
   }, [isConnected, router]);
 
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
-
   if (!isConnected || !address) {
     return null;
   }
@@ -30,14 +27,14 @@ const DashboardPage = () => {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-24 px-6 pb-12">
         <div className="max-w-5xl mx-auto">
           {/* Wallet Greeting */}
           <div className="text-center mb-10">
             <h1 className="text-2xl md:text-3xl font-semibold mb-2">
               <span className="text-white">Hi, this is your wallet address : </span>
-              <span className="gradient-text">{shortenAddress(address)}</span>
+              <span className="gradient-text">{formatAddress(address)}</span>
             </h1>
             <p className="text-muted-foreground">
               Manage your secured assets with confidence.
@@ -49,11 +46,7 @@ const DashboardPage = () => {
 
           {/* Tab Content */}
           <div className="mt-8">
-            {activeTab === "lock" ? (
-              <LockTokensForm />
-            ) : (
-              <LocksTable />
-            )}
+            {activeTab === "lock" ? <LockTokensForm /> : <LocksTable />}
           </div>
         </div>
       </div>

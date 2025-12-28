@@ -12,49 +12,22 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
-import { useVaultio, type Lock } from "@/hooks/useVaultio";
-import { ethers } from "ethers";
+import { useVaultio } from "@/hooks/useVaultio";
+import { formatAddress, formatDate, formatTokenAmount, isUnlocked } from "@/lib/utils";
+import type { Lock, LockWithIndex } from "@/types";
 
 export const LocksTable = () => {
   const { userLocks, isLoadingLocks } = useVaultio();
-  const [selectedLock, setSelectedLock] = useState<{
-    lock: Lock;
-    index: number;
-  } | null>(null);
-  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [selectedLock, setSelectedLock] = useState<LockWithIndex | null>(null);
+  const [, setCurrentTime] = useState(() => Date.now());
 
-  // Update current time every second to check unlock status
+  // Update current time every 5 seconds to trigger re-render and check unlock status
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
-
-  const formatDate = (timestamp: ethers.BigNumber) => {
-    const date = new Date(timestamp.toNumber() * 1000);
-    return (
-      date.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "2-digit",
-      }) +
-      " | " +
-      date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-    );
-  };
-
-  const isUnlocked = (unlockTime: ethers.BigNumber) => {
-    return currentTime >= unlockTime.toNumber() * 1000;
-  };
 
   const handleWithdrawClick = (lock: Lock, index: number) => {
     setSelectedLock({ lock, index });
@@ -120,10 +93,10 @@ export const LocksTable = () => {
                   className="border-border hover:bg-secondary/30"
                 >
                   <TableCell className="font-mono text-white">
-                    {shortenAddress(lock.token)}
+                    {formatAddress(lock.token)}
                   </TableCell>
                   <TableCell className="text-white">
-                    {ethers.utils.formatUnits(lock.amount, 18)}
+                    {formatTokenAmount(lock.amount)}
                   </TableCell>
                   <TableCell className="text-white">
                     {formatDate(lock.startTime)}
