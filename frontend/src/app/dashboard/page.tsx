@@ -46,7 +46,13 @@ const DashboardPage = () => {
           <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Tab Content */}
-          <div className="mt-8">{activeTab === "lock" ? <LockTokensForm /> : <LocksTable />}</div>
+          <div className="mt-8">
+            {activeTab === "lock" ? (
+              <LockTokensForm onLockSuccess={() => setActiveTab("locks")} />
+            ) : (
+              <LocksTable />
+            )}
+          </div>
         </div>
       </div>
     </main>

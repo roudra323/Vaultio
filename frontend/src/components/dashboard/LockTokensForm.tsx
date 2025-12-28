@@ -26,7 +26,11 @@ const DURATION_OPTIONS = [
   { label: "30 days", value: "43200" },
 ];
 
-export const LockTokensForm = () => {
+type LockTokensFormProps = {
+  onLockSuccess?: () => void;
+};
+
+export const LockTokensForm = ({ onLockSuccess }: LockTokensFormProps) => {
   const [tokenAddress, setTokenAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState("1");
@@ -68,9 +72,12 @@ export const LockTokensForm = () => {
       // Reset form
       setTokenAddress("");
       setAmount("");
-      setDuration("10");
+      setDuration("1");
       setStep("approve");
       setIsApproved(false);
+
+      // Redirect to My Locks tab
+      onLockSuccess?.();
     }
   };
 
