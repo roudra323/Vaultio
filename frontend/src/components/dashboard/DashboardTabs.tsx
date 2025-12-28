@@ -15,7 +15,7 @@ export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) =>
         className={cn(
           "rounded-full px-8 py-3 text-sm font-medium transition-all duration-200",
           activeTab === "lock"
-            ? "bg-secondary border-border border text-white"
+            ? "from-vaultio-purple to-vaultio-cyan bg-linear-to-r text-white shadow-lg"
             : "text-muted-foreground hover:bg-secondary/50 hover:text-white"
         )}>
         Lock Tokens
@@ -25,7 +25,7 @@ export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) =>
         className={cn(
           "rounded-full px-8 py-3 text-sm font-medium transition-all duration-200",
           activeTab === "locks"
-            ? "bg-secondary border-border border text-white"
+            ? "from-vaultio-purple to-vaultio-cyan bg-linear-to-r text-white shadow-lg"
             : "text-muted-foreground hover:bg-secondary/50 hover:text-white"
         )}>
         My Locks
