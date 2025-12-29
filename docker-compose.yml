@@ -1,0 +1,31 @@
+services:
+  hardhat:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts/contracts:/app/contracts
+      - ./contracts/scripts:/app/scripts
+      - ./contracts/test:/app/test
+      - ./contracts/ignition:/app/ignition
+    stdin_open: true
+    tty: true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:-}
+      - NEXT_PUBLIC_VAULTIO_ADDRESS=${NEXT_PUBLIC_VAULTIO_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      - NEXT_PUBLIC_HARDHAT_RPC_URL=http://localhost:8545
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - hardhat
+
