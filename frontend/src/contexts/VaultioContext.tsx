@@ -127,7 +127,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
   /**
    * Event handlers for real-time updates
    * When events are emitted, automatically refresh the locks list
-   * 
+   *
    * Note: This provides real-time updates via contract events.
    * Components may also manually call fetchUserLocks() as a fallback,
    * creating a robust dual-update system for better UX and reliability.
