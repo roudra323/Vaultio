@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useChainId } from "wagmi";
 import { toast } from "sonner";
 import {
     walletClientToSigner,
@@ -11,7 +11,7 @@ import {
 } from "@/lib/ethers";
 import { parseTokenAmount } from "@/lib/format";
 import { formatTransactionError } from "@/lib/errors";
-import { VAULTIO_ADDRESS } from "@/lib/contracts";
+import { getVaultioAddress } from "@/lib/contracts";
 import type { TransactionStatus, LockParams, ApproveParams } from "@/types";
 
 /**
@@ -21,6 +21,7 @@ import type { TransactionStatus, LockParams, ApproveParams } from "@/types";
 export const useLockTokens = (onSuccess?: () => void) => {
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
+    const chainId = useChainId();
 
     const [approveStatus, setApproveStatus] = useState<TransactionStatus>("idle");
     const [lockStatus, setLockStatus] = useState<TransactionStatus>("idle");
@@ -41,12 +42,13 @@ export const useLockTokens = (onSuccess?: () => void) => {
      */
     const checkNeedsApproval = useCallback(
         async (tokenAddress: string, amount: string): Promise<boolean> => {
-            if (!address || !walletClient) return true;
+            if (!address || !walletClient || !chainId) return true;
 
             try {
                 const signer = getSigner();
                 const tokenContract = getERC20Contract(tokenAddress, signer);
-                const allowance = await tokenContract.allowance(address, VAULTIO_ADDRESS);
+                const vaultioAddress = getVaultioAddress(chainId);
+                const allowance = await tokenContract.allowance(address, vaultioAddress);
 
                 const decimals = await getTokenDecimals(tokenAddress, signer);
                 const amountInWei = parseTokenAmount(amount, decimals);
@@ -57,7 +59,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
                 return true;
             }
         },
-        [address, walletClient, getSigner]
+        [address, walletClient, chainId, getSigner]
     );
 
     /**
@@ -65,7 +67,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
      */
     const approve = useCallback(
         async ({ tokenAddress, amount }: ApproveParams): Promise<boolean> => {
-            if (!address || !walletClient) {
+            if (!address || !walletClient || !chainId) {
                 toast.error("Please connect your wallet");
                 return false;
             }
@@ -74,11 +76,12 @@ export const useLockTokens = (onSuccess?: () => void) => {
             try {
                 const signer = getSigner();
                 const tokenContract = getERC20Contract(tokenAddress, signer);
+                const vaultioAddress = getVaultioAddress(chainId);
 
                 const decimals = await getTokenDecimals(tokenAddress, signer);
                 const amountInWei = parseTokenAmount(amount, decimals);
 
-                const tx = await tokenContract.approve(VAULTIO_ADDRESS, amountInWei);
+                const tx = await tokenContract.approve(vaultioAddress, amountInWei);
                 toast.loading("Approving tokens...", { id: "approve" });
 
                 await tx.wait();
@@ -92,7 +95,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
                 return false;
             }
         },
-        [address, walletClient, getSigner]
+        [address, walletClient, chainId, getSigner]
     );
 
     /**
@@ -100,7 +103,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
      */
     const lock = useCallback(
         async ({ tokenAddress, amount, durationInMinutes }: LockParams): Promise<boolean> => {
-            if (!address || !walletClient) {
+            if (!address || !walletClient || !chainId) {
                 toast.error("Please connect your wallet");
                 return false;
             }
@@ -108,7 +111,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
             setLockStatus("pending");
             try {
                 const signer = getSigner();
-                const vaultioContract = getVaultioContract(signer);
+                const vaultioContract = getVaultioContract(signer, chainId);
 
                 const decimals = await getTokenDecimals(tokenAddress, signer);
                 const amountInWei = parseTokenAmount(amount, decimals);
@@ -129,7 +132,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
                 return false;
             }
         },
-        [address, walletClient, getSigner, onSuccess]
+        [address, walletClient, chainId, getSigner, onSuccess]
     );
 
     /**

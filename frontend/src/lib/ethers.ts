@@ -2,7 +2,7 @@
 
 import { ethers } from "ethers";
 import type { WalletClient } from "viem";
-import { VAULTIO_ADDRESS, VAULTIO_ABI, ERC20_ABI } from "./contracts";
+import { getVaultioAddress, VAULTIO_ABI, ERC20_ABI } from "./contracts";
 
 /**
  * Convert a Wagmi WalletClient to an Ethers.js Signer
@@ -49,9 +49,12 @@ export const walletClientToProvider = (
 
 /**
  * Get a Vaultio contract instance with a signer
+ * @param signer - The ethers signer to use
+ * @param chainId - The chain ID to get the contract address for
  */
-export const getVaultioContract = (signer: ethers.Signer): ethers.Contract => {
-  return new ethers.Contract(VAULTIO_ADDRESS, VAULTIO_ABI, signer);
+export const getVaultioContract = (signer: ethers.Signer, chainId: number): ethers.Contract => {
+  const address = getVaultioAddress(chainId);
+  return new ethers.Contract(address, VAULTIO_ABI, signer);
 };
 
 /**

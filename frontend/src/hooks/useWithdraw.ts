@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useChainId } from "wagmi";
 import { toast } from "sonner";
 import { walletClientToSigner, getVaultioContract } from "@/lib/ethers";
 import { formatTransactionError } from "@/lib/errors";
@@ -14,6 +14,7 @@ import type { TransactionStatus } from "@/types";
 export const useWithdraw = (onSuccess?: () => void) => {
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
+    const chainId = useChainId();
 
     const [status, setStatus] = useState<TransactionStatus>("idle");
 
@@ -34,7 +35,7 @@ export const useWithdraw = (onSuccess?: () => void) => {
      */
     const withdraw = useCallback(
         async (lockId: number): Promise<boolean> => {
-            if (!address || !walletClient) {
+            if (!address || !walletClient || !chainId) {
                 toast.error("Please connect your wallet");
                 return false;
             }
@@ -42,7 +43,7 @@ export const useWithdraw = (onSuccess?: () => void) => {
             setStatus("pending");
             try {
                 const signer = getSigner();
-                const vaultioContract = getVaultioContract(signer);
+                const vaultioContract = getVaultioContract(signer, chainId);
 
                 const tx = await vaultioContract.withdrawTokens(lockId);
 
@@ -60,7 +61,7 @@ export const useWithdraw = (onSuccess?: () => void) => {
                 return false;
             }
         },
-        [address, walletClient, getSigner, onSuccess]
+        [address, walletClient, chainId, getSigner, onSuccess]
     );
 
     /**

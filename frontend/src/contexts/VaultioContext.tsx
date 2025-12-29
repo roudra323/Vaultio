@@ -9,7 +9,7 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useChainId } from "wagmi";
 import { walletClientToSigner, getVaultioContract, getTokenDecimals } from "@/lib/ethers";
 import type { Lock } from "@/types";
 
@@ -36,6 +36,7 @@ type VaultioProviderProps = {
 export const VaultioProvider = ({ children }: VaultioProviderProps) => {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const chainId = useChainId();
 
   // State
   const [userLocks, setUserLocks] = useState<Lock[]>([]);
@@ -65,7 +66,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
    * Fetch user locks from the contract
    */
   const fetchUserLocks = useCallback(async () => {
-    if (!address || !walletClient) {
+    if (!address || !walletClient || !chainId) {
       setUserLocks([]);
       return;
     }
@@ -73,7 +74,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     setIsLoadingLocks(true);
     try {
       const signer = getSigner();
-      const vaultioContract = getVaultioContract(signer);
+      const vaultioContract = getVaultioContract(signer, chainId);
       const locks = await vaultioContract.getUserLocks(address);
 
       // Convert the array of structs to our Lock type
@@ -111,7 +112,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     } finally {
       setIsLoadingLocks(false);
     }
-  }, [address, walletClient, getSigner, tokenDecimals]);
+  }, [address, walletClient, chainId, getSigner, tokenDecimals]);
 
   // Fetch locks when wallet connects or address changes
   useEffect(() => {
