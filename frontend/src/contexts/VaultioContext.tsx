@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useAccount, useWalletClient, useChainId } from "wagmi";
 import { walletClientToSigner, getVaultioContract, getTokenDecimals } from "@/lib/ethers";
+import { useVaultioEvents } from "@/hooks/useVaultioEvents";
 import type { Lock } from "@/types";
 
 // Context state type - simplified to only data management
@@ -122,6 +123,28 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       setUserLocks([]);
     }
   }, [isConnected, address, walletClient, fetchUserLocks]);
+
+  /**
+   * Event handlers for real-time updates
+   * When events are emitted, automatically refresh the locks list
+   * 
+   * Note: This provides real-time updates via contract events.
+   * Components may also manually call fetchUserLocks() as a fallback,
+   * creating a robust dual-update system for better UX and reliability.
+   */
+  const handleTokenLocked = useCallback(() => {
+    console.log("TokenLocked event detected - refreshing locks...");
+    fetchUserLocks();
+  }, [fetchUserLocks]);
+
+  const handleTokenWithdrawn = useCallback(() => {
+    console.log("TokenWithdrawn event detected - refreshing locks...");
+    fetchUserLocks();
+  }, [fetchUserLocks]);
+
+  // Set up event listeners for real-time updates
+  // Filters events by connected user address for efficient updates
+  useVaultioEvents(handleTokenLocked, handleTokenWithdrawn, isConnected && !!address);
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo<VaultioContextState>(
