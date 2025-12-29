@@ -7,6 +7,7 @@ import { Header } from "@/components/layout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { LockTokensForm } from "@/components/dashboard/LockTokensForm";
 import { LocksTable } from "@/components/dashboard/LocksTable";
+import { shortenAddress } from "@/lib/format";
 
 const DashboardPage = () => {
   const { address, isConnected } = useAccount();
@@ -18,10 +19,6 @@ const DashboardPage = () => {
       router.push("/");
     }
   }, [isConnected, router]);
-
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   if (!isConnected || !address) {
     return null;

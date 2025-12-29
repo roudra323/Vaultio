@@ -12,54 +12,25 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { WithdrawModal } from "@/components/dashboard/WithdrawModal";
-import { useVaultio, type Lock } from "@/hooks/useVaultio";
-import { ethers } from "ethers";
+import { useUserLocks } from "@/hooks";
+import { shortenAddress, formatDate, formatTokenAmount, isLockUnlocked } from "@/lib/format";
+import type { Lock } from "@/types";
 
 export const LocksTable = () => {
-  const { userLocks, isLoadingLocks, tokenDecimals } = useVaultio();
+  const { userLocks, isLoading, getDecimalsForToken } = useUserLocks();
   const [selectedLock, setSelectedLock] = useState<{
     lock: Lock;
     index: number;
   } | null>(null);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
-  // Update current time every second to check unlock status
+  // Update current time every 5 seconds to check unlock status
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
-
-  const formatDate = (timestamp: ethers.BigNumber) => {
-    const date = new Date(timestamp.toNumber() * 1000);
-    return (
-      date.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "2-digit",
-      }) +
-      " | " +
-      date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-    );
-  };
-
-  const isUnlocked = (unlockTime: ethers.BigNumber) => {
-    return currentTime >= unlockTime.toNumber() * 1000;
-  };
-
-  const getDecimalsForToken = (tokenAddress: string): number => {
-    const normalizedAddress = tokenAddress.toLowerCase();
-    return tokenDecimals[normalizedAddress] ?? 18;
-  };
 
   const handleWithdrawClick = (lock: Lock, index: number) => {
     setSelectedLock({ lock, index });
@@ -69,7 +40,7 @@ export const LocksTable = () => {
     setSelectedLock(null);
   };
 
-  if (isLoadingLocks) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-vaultio-cyan h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
@@ -103,8 +74,9 @@ export const LocksTable = () => {
           <TableBody>
             {[...userLocks].reverse().map((lock, reversedIndex) => {
               const index = userLocks.length - 1 - reversedIndex;
-              const unlocked = isUnlocked(lock.unlockTime);
+              const unlocked = isLockUnlocked(lock.unlockTime, currentTime);
               const canWithdraw = unlocked && !lock.withdrawn;
+              const decimals = getDecimalsForToken(lock.token);
 
               return (
                 <TableRow key={index} className="border-border hover:bg-secondary/30">
@@ -112,7 +84,7 @@ export const LocksTable = () => {
                     {shortenAddress(lock.token)}
                   </TableCell>
                   <TableCell className="text-white">
-                    {ethers.utils.formatUnits(lock.amount, getDecimalsForToken(lock.token))}
+                    {formatTokenAmount(lock.amount, decimals)}
                   </TableCell>
                   <TableCell className="text-white">{formatDate(lock.startTime)}</TableCell>
                   <TableCell className="text-white">{formatDate(lock.unlockTime)}</TableCell>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,11 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useVaultio } from "@/hooks/useVaultio";
+import { useLockTokens, useUserLocks } from "@/hooks";
 import { Loader2 } from "lucide-react";
+import type { Address, DurationOption } from "@/types";
 
 // Convert Chosen Duration to Minutes for the contract
-const DURATION_OPTIONS = [
+const DURATION_OPTIONS: DurationOption[] = [
   { label: "1 min", value: "1" },
   { label: "10 mins", value: "10" },
   { label: "30 mins", value: "30" },
@@ -37,13 +38,21 @@ export const LockTokensForm = ({ onLockSuccess }: LockTokensFormProps) => {
   const [step, setStep] = useState<"approve" | "lock">("approve");
   const [isApproved, setIsApproved] = useState(false);
 
-  const { approveTokens, lockTokens, isApproving, isLocking, checkAllowance } = useVaultio();
+  const { refetchLocks } = useUserLocks();
+
+  const handleLockSuccess = useCallback(() => {
+    refetchLocks();
+    onLockSuccess?.();
+  }, [refetchLocks, onLockSuccess]);
+
+  const { approve, lock, checkNeedsApproval, isApproving, isLocking, reset } =
+    useLockTokens(handleLockSuccess);
 
   // Check allowance when token address or amount changes
   useEffect(() => {
     const checkApproval = async () => {
       if (tokenAddress && amount && parseFloat(amount) > 0) {
-        const needsApproval = await checkAllowance(tokenAddress, amount);
+        const needsApproval = await checkNeedsApproval(tokenAddress, amount);
         setIsApproved(!needsApproval);
         setStep(needsApproval ? "approve" : "lock");
       } else {
@@ -52,12 +61,15 @@ export const LockTokensForm = ({ onLockSuccess }: LockTokensFormProps) => {
       }
     };
     checkApproval();
-  }, [tokenAddress, amount, checkAllowance]);
+  }, [tokenAddress, amount, checkNeedsApproval]);
 
   const handleApprove = async () => {
     if (!tokenAddress || !amount) return;
 
-    const success = await approveTokens(tokenAddress, amount);
+    const success = await approve({
+      tokenAddress: tokenAddress as Address,
+      amount,
+    });
     if (success) {
       setIsApproved(true);
       setStep("lock");
@@ -67,7 +79,11 @@ export const LockTokensForm = ({ onLockSuccess }: LockTokensFormProps) => {
   const handleLock = async () => {
     if (!tokenAddress || !amount || !duration) return;
 
-    const success = await lockTokens(tokenAddress, amount, parseInt(duration));
+    const success = await lock({
+      tokenAddress: tokenAddress as Address,
+      amount,
+      durationInMinutes: parseInt(duration),
+    });
     if (success) {
       // Reset form
       setTokenAddress("");
@@ -75,9 +91,7 @@ export const LockTokensForm = ({ onLockSuccess }: LockTokensFormProps) => {
       setDuration("1");
       setStep("approve");
       setIsApproved(false);
-
-      // Redirect to My Locks tab
-      onLockSuccess?.();
+      reset();
     }
   };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -8,8 +9,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useVaultio, type Lock } from "@/hooks/useVaultio";
-import { ethers } from "ethers";
+import { useWithdraw, useUserLocks } from "@/hooks";
+import { shortenAddress, formatTokenAmount } from "@/lib/format";
+import type { Lock } from "@/types";
 
 type WithdrawModalProps = {
   lock: Lock;
@@ -26,17 +28,17 @@ export const WithdrawModal = ({
   onClose,
   decimals,
 }: WithdrawModalProps) => {
-  const { withdrawTokens, isWithdrawing } = useVaultio();
+  const { refetchLocks } = useUserLocks();
 
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
+  const handleWithdrawSuccess = useCallback(() => {
+    refetchLocks();
+    onClose();
+  }, [refetchLocks, onClose]);
+
+  const { withdraw, isWithdrawing } = useWithdraw(handleWithdrawSuccess);
 
   const handleConfirmWithdraw = async () => {
-    const success = await withdrawTokens(lockIndex);
-    if (success) {
-      onClose();
-    }
+    await withdraw(lockIndex);
   };
 
   return (
@@ -64,7 +66,7 @@ export const WithdrawModal = ({
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Amount</span>
             <span className="font-medium text-white">
-              {ethers.utils.formatUnits(lock.amount, decimals)}
+              {formatTokenAmount(lock.amount, decimals)}
             </span>
           </div>
           <div className="flex items-center justify-between">
