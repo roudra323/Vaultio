@@ -36,11 +36,7 @@
 
 ## Project Overview
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #0366d6; margin: 1rem 0;">
-
-Vaultio is a smart contract-based token vault system that provides secure, time-locked storage for ERC-20 tokens. Users can lock their tokens for a customizable duration (specified in minutes), and withdraw them only after the lock period has expired. The system uses OpenZeppelin's SafeERC20 library for secure token transfers and proper error handling.
-
-</div>
+**Vaultio is a smart contract-based token vault system that provides secure, time-locked storage for ERC-20 tokens. Users can lock their tokens for a customizable duration (specified in minutes), and withdraw them only after the lock period has expired. The system uses OpenZeppelin's SafeERC20 library for secure token transfers and proper error handling.**
 
 ### Key Components
 
@@ -105,11 +101,7 @@ Vaultio is a smart contract-based token vault system that provides secure, time-
 
 ## Prerequisites
 
-<div style="background-color: #fff3cd; padding: 1rem; border-radius: 6px; border-left: 4px solid #ffc107; margin: 1rem 0;">
-
-<strong>Required Software:</strong>
-
-</div>
+**Required Software:**
 
 <table>
 <thead>
@@ -122,7 +114,7 @@ Vaultio is a smart contract-based token vault system that provides secure, time-
 <tbody>
 <tr>
 <td><strong>Node.js</strong></td>
-<td>v18+</td>
+<td>v20+</td>
 <td>JavaScript runtime</td>
 </tr>
 <tr>
@@ -191,22 +183,14 @@ cd Vaultio
 
 ### 2. Install Dependencies
 
-<div style="background-color: #d1ecf1; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-<strong>Install contract dependencies:</strong>
-
-</div>
+**Install contract dependencies:**
 
 ```bash
 cd contracts
 pnpm install
 ```
 
-<div style="background-color: #d1ecf1; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-<strong>Install frontend dependencies:</strong>
-
-</div>
+**Install frontend dependencies:**
 
 ```bash
 cd ../frontend
@@ -309,11 +293,7 @@ make deploy-mock
 
 ### Sepolia Testnet Deployment
 
-<div style="background-color: #d4edda; padding: 1rem; border-radius: 6px; border-left: 4px solid #28a745; margin: 1rem 0;">
-
-<strong>Production Deployment Checklist:</strong>
-
-</div>
+**Production Deployment Checklist:**
 
 <table>
 <thead>
@@ -348,29 +328,22 @@ make deploy-mock
 
 ### 1. Configure Contract Address
 
-<div style="background-color: #e7f3ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-
-<strong>Option 1: Environment Variable (Recommended)</strong>
+**Option 1: Environment Variable (Recommended)**
 
 Update `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_VAULTIO_ADDRESS=0xYourDeployedContractAddress
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
 ```
 
-</div>
-
-<div style="background-color: #f0f0f0; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-
-<strong>Option 2: Direct Configuration</strong>
+**Option 2: Direct Configuration**
 
 Update `frontend/src/lib/contracts.ts`:
 
 ```typescript
 export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 ```
-
-</div>
 
 ### 2. Configure Network
 
@@ -414,11 +387,7 @@ cd frontend
 pnpm dev
 ```
 
-<div style="background-color: #d1ecf1; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-Application available at: <strong>http://localhost:3000</strong>
-
-</div>
+Application available at: **http://localhost:3000**
 
 ### 4. Build for Production
 
@@ -434,26 +403,16 @@ pnpm start
 
 ### Contract Address Configuration
 
-<div style="background-color: #fff3cd; padding: 1rem; border-radius: 6px; border-left: 4px solid #ffc107; margin: 1rem 0;">
+**Configuration Priority:**
 
-<strong>Configuration Priority:</strong>
+1. Environment variable: `NEXT_PUBLIC_VAULTIO_ADDRESS`
+2. Fallback: Default address in `frontend/src/lib/contracts.ts`
 
-</div>
-
-<ol>
-<li>Environment variable: <code>NEXT_PUBLIC_VAULTIO_ADDRESS</code></li>
-<li>Fallback: Default address in <code>frontend/src/lib/contracts.ts</code></li>
-</ol>
-
-<div style="background-color: #d4edda; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-<strong>To update after deployment:</strong>
+**To update after deployment:**
 
 1. Copy deployed contract address from deployment output
-2. Add/update <code>NEXT_PUBLIC_VAULTIO_ADDRESS</code> in <code>frontend/.env.local</code>
+2. Add/update `NEXT_PUBLIC_VAULTIO_ADDRESS` in `frontend/.env.local`
 3. Restart frontend development server
-
-</div>
 
 ### Network Configuration
 
@@ -501,11 +460,7 @@ networks: {
 
 ### Complete Workflow: Approve → Lock → Withdraw
 
-<div style="background-color: #e7f3ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-
-<strong>Workflow Overview:</strong>
-
-</div>
+**Workflow Overview:**
 
 <table>
 <tr>
@@ -532,11 +487,7 @@ Withdraw after expiration
 
 #### Step 1: Approve Tokens
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Command Line:</strong>
-
-</div>
+**Command Line:**
 
 ```bash
 cd contracts
@@ -549,11 +500,7 @@ TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=1000 \
   npx hardhat run scripts/approve.ts --network localhost
 ```
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Via Frontend:</strong>
-
-</div>
+**Via Frontend:**
 
 <ol>
 <li>Connect your wallet</li>
@@ -564,11 +511,7 @@ TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=1000 \
 
 #### Step 2: Lock Tokens
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Command Line:</strong>
-
-</div>
+**Command Line:**
 
 ```bash
 cd contracts
@@ -581,11 +524,7 @@ TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=100 DURATION=5 \
   npx hardhat run scripts/lock.ts --network localhost
 ```
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Via Frontend:</strong>
-
-</div>
+**Via Frontend:**
 
 <ol>
 <li>Ensure tokens are approved</li>
@@ -597,11 +536,7 @@ TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=100 DURATION=5 \
 
 #### Step 3: Withdraw Tokens
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Command Line:</strong>
-
-</div>
+**Command Line:**
 
 ```bash
 cd contracts
@@ -614,11 +549,7 @@ VAULTIO_ADDRESS=0x... LOCK_ID=0 \
   npx hardhat run scripts/withdraw.ts --network localhost
 ```
 
-<div style="background-color: #f6f8fa; padding: 1rem; border-radius: 6px; margin: 0.5rem 0;">
-
-<strong>Via Frontend:</strong>
-
-</div>
+**Via Frontend:**
 
 <ol>
 <li>Navigate to the dashboard</li>
@@ -629,11 +560,7 @@ VAULTIO_ADDRESS=0x... LOCK_ID=0 \
 
 ### Quick Demo Script
 
-<div style="background-color: #d4edda; padding: 1rem; border-radius: 6px; border-left: 4px solid #28a745; margin: 1rem 0;">
-
-<strong>Run Complete Demo:</strong>
-
-</div>
+**Run Complete Demo:**
 
 ```bash
 cd contracts
@@ -882,11 +809,7 @@ pnpm format:check
 
 ## Security Considerations
 
-<div style="background-color: #f8d7da; padding: 1rem; border-radius: 6px; border-left: 4px solid #dc3545; margin: 1rem 0;">
-
-<strong>Security Features:</strong>
-
-</div>
+**Security Features:**
 
 <table>
 <tr>
@@ -909,11 +832,7 @@ pnpm format:check
 </tr>
 </table>
 
-<div style="background-color: #fff3cd; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-<strong>Important:</strong> Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
-
-</div>
+**Important:** Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
 
 ---
 
@@ -925,11 +844,7 @@ This project is licensed under the **MIT License**.
 
 ## Support
 
-<div style="background-color: #e7f3ff; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
-
 For issues, questions, or contributions, please open an issue in the repository.
-
-</div>
 
 ---
 
