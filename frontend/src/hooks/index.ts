@@ -3,3 +3,4 @@ export { useUserLocks } from "./useUserLocks";
 export { useLockTokens } from "./useLockTokens";
 export { useWithdraw } from "./useWithdraw";
 export { useTokenDecimals } from "./useTokenDecimals";
+export { useVaultioEvents } from "./useVaultioEvents";
