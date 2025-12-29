@@ -62,20 +62,6 @@ export const getERC20Contract = (tokenAddress: string, signer: ethers.Signer): e
 };
 
 /**
- * Parse units helper (18 decimals by default)
- */
-export const parseTokenAmount = (amount: string, decimals: number = 18): ethers.BigNumber => {
-  return ethers.utils.parseUnits(amount, decimals);
-};
-
-/**
- * Format units helper (18 decimals by default)
- */
-export const formatTokenAmount = (amount: ethers.BigNumber, decimals: number = 18): string => {
-  return ethers.utils.formatUnits(amount, decimals);
-};
-
-/**
  * Fetch token decimals from an ERC20 contract
  * Returns the decimal count (typically 6, 8, or 18)
  * Defaults to 18 if the call fails (for non-standard tokens)
