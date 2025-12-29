@@ -3,8 +3,7 @@ import { http } from "wagmi";
 import { mainnet, sepolia, hardhat } from "wagmi/chains";
 
 // Use environment variable for Hardhat RPC URL (supports Docker networking)
-const HARDHAT_RPC_URL =
-  process.env.NEXT_PUBLIC_HARDHAT_RPC_URL || "http://127.0.0.1:8545";
+const HARDHAT_RPC_URL = process.env.NEXT_PUBLIC_HARDHAT_RPC_URL || "http://127.0.0.1:8545";
 
 export const config = getDefaultConfig({
   appName: "Vaultio",
