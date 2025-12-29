@@ -24,7 +24,6 @@ contract Vaultio {
     error InvalidLockId();
     error TokensAlreadyWithdrawn();
     error LockPeriodNotExpired();
-    error CallerIsNotAnWalletAddress();
 
     // ============ Structs ============
 
@@ -75,7 +74,6 @@ contract Vaultio {
     ) external returns (uint256 lockId) {
         // ============ Checks ============
 
-        if (msg.sender.code.length != 0) revert CallerIsNotAnWalletAddress();
         if (token == address(0)) revert InvalidTokenAddress();
         if (amount == 0) revert InvalidAmount();
         if (durationInMinutes == 0) revert InvalidDuration();
