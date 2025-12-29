@@ -6,22 +6,22 @@
  * Duration option for lock duration selection
  */
 export type DurationOption = {
-    label: string;
-    value: string;
+  label: string;
+  value: string;
 };
 
 /**
  * Props for components that accept children
  */
 export type WithChildren = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 /**
  * Async function result type
  */
 export type AsyncResult<T> = {
-    data: T | null;
-    error: Error | null;
-    isLoading: boolean;
+  data: T | null;
+  error: Error | null;
+  isLoading: boolean;
 };

@@ -12,7 +12,8 @@ export const VAULTIO_ADDRESSES: Record<number, string> = {
   1: process.env.NEXT_PUBLIC_VAULTIO_ADDRESS_MAINNET || "", // Ethereum Mainnet
   42161: process.env.NEXT_PUBLIC_VAULTIO_ADDRESS_ARBITRUM || "", // Arbitrum One
   11155111: process.env.NEXT_PUBLIC_VAULTIO_ADDRESS_SEPOLIA || "", // Sepolia Testnet
-  31337: process.env.NEXT_PUBLIC_VAULTIO_ADDRESS_LOCAL || "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Hardhat Local
+  31337:
+    process.env.NEXT_PUBLIC_VAULTIO_ADDRESS_LOCAL || "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Hardhat Local
 };
 
 /**
