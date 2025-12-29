@@ -29,8 +29,8 @@ verify:
 
 # Deploy a MockERC20 token
 # Usage: make deploy-mock
-# Env vars: TOKEN_NAME, TOKEN_SYMBOL
-# Example: make deploy-mock TOKEN_NAME="Ziku Token" TOKEN_SYMBOL="ZKT"
+# Env vars: TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS
+# Example: make deploy-mock TOKEN_NAME="Ziku Token" TOKEN_SYMBOL="ZKT" TOKEN_DECIMALS=18
 deploy-mock:
 	npx hardhat run scripts/deploy-mock.ts --network localhost
 

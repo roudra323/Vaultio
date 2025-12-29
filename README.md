@@ -7,6 +7,7 @@
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.28-blue.svg)](https://soliditylang.org/)
 [![Hardhat](https://img.shields.io/badge/Hardhat-2.28.0-yellow.svg)](https://hardhat.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black.svg)](https://nextjs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -21,12 +22,17 @@
 - [Project Overview](#project-overview)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
+  - [Option A: Docker (Recommended)](#option-a-docker-recommended)
+  - [Option B: Manual Setup](#option-b-manual-setup)
+- [MetaMask Configuration](#metamask-configuration)
 - [Project Structure](#project-structure)
-- [Setup](#setup)
-- [Contract Deployment](#contract-deployment)
+- [Quick Start](#quick-start)
+  - [Docker Setup (Recommended)](#docker-setup-recommended)
+  - [Manual Setup](#manual-setup)
 - [Frontend Setup](#frontend-setup)
-- [Configuration](#configuration)
+- [Network Configuration](#network-configuration)
 - [Usage Examples](#usage-examples)
+- [Screenshots](#screenshots)
 - [Development](#development)
 - [Security Considerations](#security-considerations)
 
@@ -62,11 +68,11 @@
 </td>
 <td width="33%">
 
-**Scripts**
+**DevOps**
 
-- Hardhat scripts
-- Makefile commands
-- Deployment automation
+- Docker & Docker Compose
+- Makefile automation
+- Hot-reload development
 
 </td>
 </tr>
@@ -101,7 +107,52 @@
 
 ## Prerequisites
 
-**Required Software:**
+Choose one of the following setup options:
+
+### Option A: Docker (Recommended)
+
+> 🐳 **This is the recommended approach** - No need to install Node.js, pnpm, or manage dependencies manually.
+
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Docker</strong></td>
+<td>v20+</td>
+<td>Container runtime</td>
+</tr>
+<tr>
+<td><strong>Docker Compose</strong></td>
+<td>v2.0+</td>
+<td>Multi-container orchestration</td>
+</tr>
+<tr>
+<td><strong>Make</strong></td>
+<td>Any</td>
+<td>Command automation</td>
+</tr>
+<tr>
+<td><strong>Git</strong></td>
+<td>Latest</td>
+<td>Version control</td>
+</tr>
+<tr>
+<td><strong>MetaMask</strong></td>
+<td>Latest</td>
+<td>Web3 wallet (configured for Hardhat)</td>
+</tr>
+</tbody>
+</table>
+
+### Option B: Manual Setup
+
+> ⚙️ Traditional setup with local Node.js installation.
 
 <table>
 <thead>
@@ -123,6 +174,11 @@
 <td>Package manager</td>
 </tr>
 <tr>
+<td><strong>Make</strong></td>
+<td>Any</td>
+<td>Command automation</td>
+</tr>
+<tr>
 <td><strong>Git</strong></td>
 <td>Latest</td>
 <td>Version control</td>
@@ -130,15 +186,62 @@
 <tr>
 <td><strong>MetaMask</strong></td>
 <td>Latest</td>
-<td>Web3 wallet</td>
-</tr>
-<tr>
-<td><strong>Hardhat Node</strong></td>
-<td>Latest</td>
-<td>Local blockchain</td>
+<td>Web3 wallet (configured for Hardhat)</td>
 </tr>
 </tbody>
 </table>
+
+---
+
+## MetaMask Configuration
+
+Before using the application, you need to configure MetaMask to connect to the local Hardhat network.
+
+### Step 1: Add Hardhat Network to MetaMask
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Network Name</strong></td>
+<td>Hardhat Local</td>
+</tr>
+<tr>
+<td><strong>RPC URL</strong></td>
+<td><code>http://127.0.0.1:8545</code></td>
+</tr>
+<tr>
+<td><strong>Chain ID</strong></td>
+<td><code>31337</code></td>
+</tr>
+<tr>
+<td><strong>Currency Symbol</strong></td>
+<td>ETH</td>
+</tr>
+</tbody>
+</table>
+
+**How to add:**
+
+1. Open MetaMask and click on the network dropdown
+2. Click "Add Network" → "Add a network manually"
+3. Enter the settings from the table above
+4. Click "Save"
+
+### Step 2: Import a Hardhat Test Account
+
+When Hardhat node starts, it displays 20 test accounts with pre-funded ETH. Import one of these accounts into MetaMask:
+
+1. Copy a private key from the Hardhat node output (e.g., `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`)
+2. In MetaMask, click the account icon → "Import Account"
+3. Paste the private key and click "Import"
+
+> ⚠️ **Important:** These are test accounts only. Never use them on mainnet or with real funds.
 
 ---
 
@@ -149,14 +252,20 @@
 
 ```
 Vaultio/
-├── contracts/              # Smart contract code
-│   ├── contracts/         # Solidity contracts
+├── docker-compose.yml     # Docker services configuration
+├── Makefile              # Root Makefile (Docker commands)
+│
+├── contracts/             # Smart contract code
+│   ├── Dockerfile        # Hardhat container
+│   ├── Makefile          # Contract Makefile (manual commands)
+│   ├── contracts/        # Solidity contracts
 │   ├── scripts/          # Deployment and interaction scripts
 │   ├── test/             # Contract tests
 │   ├── ignition/         # Hardhat Ignition deployment modules
 │   └── hardhat.config.ts # Hardhat configuration
 │
 ├── frontend/              # Next.js frontend application
+│   ├── Dockerfile        # Frontend container
 │   ├── src/
 │   │   ├── app/          # Next.js app router pages
 │   │   ├── components/   # React components
@@ -165,6 +274,8 @@ Vaultio/
 │   │   └── abi/          # Contract ABIs
 │   └── public/           # Static assets
 │
+├── screenshots/           # Application screenshots
+│
 └── README.md             # This file
 ```
 
@@ -172,87 +283,158 @@ Vaultio/
 
 ---
 
-## Setup
+## Quick Start
 
-### 1. Clone the Repository
+### Docker Setup (Recommended)
+
+> 🐳 All commands are run from the **project root directory**.
+
+#### Step 1: Clone and Start Containers
 
 ```bash
+# Clone the repository
 git clone <repository-url>
 cd Vaultio
+
+# Start all Docker containers
+make up
 ```
 
-### 2. Install Dependencies
-
-**Install contract dependencies:**
+#### Step 2: Start Hardhat Node
 
 ```bash
+# In a new terminal, start the Hardhat node
+make node
+```
+
+Keep this terminal running. You'll see output showing 20 test accounts with their private keys.
+
+#### Step 3: Deploy Contracts
+
+```bash
+# In another terminal, deploy the Vaultio contract
+make deploy-local
+```
+
+Save the deployed contract address from the output.
+
+#### Step 4: Deploy Mock ERC-20 Token (Optional)
+
+```bash
+# Deploy a mock token for testing (defaults: Mock Token, MTK, 6 decimals)
+make deploy-mock
+
+# Or with custom name/symbol/decimals
+make deploy-mock TOKEN_NAME="Test Token" TOKEN_SYMBOL="TEST" TOKEN_DECIMALS=18
+```
+
+#### Step 5: Mint Test Tokens (Optional)
+
+```bash
+# Mint tokens to your address
+make mint
+```
+
+#### Docker Commands Reference
+
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make up</code></td>
+<td>Start all containers in background</td>
+</tr>
+<tr>
+<td><code>make up-build</code></td>
+<td>Start containers with rebuild</td>
+</tr>
+<tr>
+<td><code>make down</code></td>
+<td>Stop all containers</td>
+</tr>
+<tr>
+<td><code>make logs</code></td>
+<td>View logs from all services</td>
+</tr>
+<tr>
+<td><code>make logs-hardhat</code></td>
+<td>View Hardhat container logs</td>
+</tr>
+<tr>
+<td><code>make logs-frontend</code></td>
+<td>View Frontend container logs</td>
+</tr>
+<tr>
+<td><code>make shell-hardhat</code></td>
+<td>Open shell in Hardhat container</td>
+</tr>
+<tr>
+<td><code>make shell-frontend</code></td>
+<td>Open shell in Frontend container</td>
+</tr>
+<tr>
+<td><code>make node</code></td>
+<td>Start Hardhat node inside container</td>
+</tr>
+<tr>
+<td><code>make stop-node</code></td>
+<td>Stop Hardhat node</td>
+</tr>
+<tr>
+<td><code>make compile</code></td>
+<td>Compile contracts</td>
+</tr>
+<tr>
+<td><code>make test</code></td>
+<td>Run contract tests</td>
+</tr>
+<tr>
+<td><code>make deploy-local</code></td>
+<td>Deploy Vaultio contract locally</td>
+</tr>
+<tr>
+<td><code>make deploy-mock</code></td>
+<td>Deploy mock ERC-20 token</td>
+</tr>
+<tr>
+<td><code>make mint</code></td>
+<td>Mint tokens to an address</td>
+</tr>
+<tr>
+<td><code>make demo</code></td>
+<td>Run full demo workflow</td>
+</tr>
+</tbody>
+</table>
+
+---
+
+### Manual Setup
+
+> ⚙️ All commands are run from the **`contracts/` directory** unless specified otherwise.
+
+#### Step 1: Clone and Install Dependencies
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Vaultio
+
+# Install contract dependencies
 cd contracts
 pnpm install
-```
 
-**Install frontend dependencies:**
-
-```bash
+# Install frontend dependencies
 cd ../frontend
 pnpm install
 ```
 
-### 3. Environment Variables
-
-<details>
-<summary><b>Contracts Environment Configuration</b></summary>
-
-Create a `.env` file in the `contracts/` directory:
-
-```bash
-cd contracts
-```
-
-```env
-# Required for Sepolia deployment
-PRIVATE_KEY=your_private_key_here
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your_api_key
-ETHERSCAN_API_KEY=your_etherscan_api_key
-```
-
-<div style="background-color: #f8d7da; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0;">
-
-<strong>⚠️ Security Note:</strong> Never commit your `.env` file to version control. Add it to `.gitignore`.
-
-</div>
-
-</details>
-
-<details>
-<summary><b>Frontend Environment Configuration</b></summary>
-
-Create a `.env.local` file in the `frontend/` directory:
-
-```bash
-cd frontend
-```
-
-```env
-# Contract address (will be set after deployment)
-NEXT_PUBLIC_VAULTIO_ADDRESS=0x...
-
-# WalletConnect Project ID (optional, for WalletConnect support)
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
-```
-
-</details>
-
----
-
-## Contract Deployment
-
-### Local Development Network
-
-<table>
-<tr>
-<td width="50%">
-
-<strong>Step 1: Start Hardhat Node</strong>
+#### Step 2: Start Hardhat Node
 
 ```bash
 cd contracts
@@ -260,64 +442,100 @@ make node
 # Or: npx hardhat node
 ```
 
-Keep this terminal running.  
-Node starts on `http://127.0.0.1:8545`
+Keep this terminal running. Node starts on `http://127.0.0.1:8545`.
 
-</td>
-<td width="50%">
-
-<strong>Step 2: Deploy Vaultio Contract</strong>
+#### Step 3: Deploy Contracts
 
 ```bash
+# In a new terminal
 cd contracts
 make deploy-local
 ```
 
-Save the contract address for frontend configuration.
+Save the deployed contract address from the output.
 
-</td>
-</tr>
-<tr>
-<td colspan="2">
-
-<strong>Step 3: Deploy Mock Token (Optional)</strong>
+#### Step 4: Deploy Mock ERC-20 Token (Optional)
 
 ```bash
+cd contracts
 make deploy-mock
-# Customize: TOKEN_NAME="Test Token" TOKEN_SYMBOL="TEST" make deploy-mock
+
+# Or with custom name/symbol/decimals
+TOKEN_NAME="Test Token" TOKEN_SYMBOL="TEST" TOKEN_DECIMALS=18 make deploy-mock
 ```
 
-</td>
-</tr>
-</table>
+#### Step 5: Mint Test Tokens (Optional)
 
-### Sepolia Testnet Deployment
+```bash
+cd contracts
+make mint
+```
 
-**Production Deployment Checklist:**
+#### Manual Commands Reference
 
 <table>
 <thead>
 <tr>
-<th>Step</th>
-<th>Action</th>
 <th>Command</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>1</strong></td>
-<td>Configure environment variables</td>
-<td>Set PRIVATE_KEY, SEPOLIA_RPC_URL, ETHERSCAN_API_KEY</td>
+<td><code>make node</code></td>
+<td>Start Hardhat node</td>
 </tr>
 <tr>
-<td><strong>2</strong></td>
-<td>Deploy to Sepolia</td>
+<td><code>make stop-node</code></td>
+<td>Stop Hardhat node</td>
+</tr>
+<tr>
+<td><code>make compile</code></td>
+<td>Compile contracts</td>
+</tr>
+<tr>
+<td><code>make test</code></td>
+<td>Run contract tests</td>
+</tr>
+<tr>
+<td><code>make clean</code></td>
+<td>Clean build artifacts</td>
+</tr>
+<tr>
+<td><code>make deploy-local</code></td>
+<td>Deploy to localhost</td>
+</tr>
+<tr>
 <td><code>make deploy-sepolia</code></td>
+<td>Deploy to Sepolia testnet</td>
 </tr>
 <tr>
-<td><strong>3</strong></td>
-<td>Verify contract (if needed)</td>
 <td><code>make verify</code></td>
+<td>Verify contract on Etherscan</td>
+</tr>
+<tr>
+<td><code>make deploy-mock</code></td>
+<td>Deploy mock ERC-20 token</td>
+</tr>
+<tr>
+<td><code>make mint</code></td>
+<td>Mint tokens to an address</td>
+</tr>
+<tr>
+<td><code>make approve</code></td>
+<td>Approve Vaultio to spend tokens</td>
+</tr>
+<tr>
+<td><code>make lock</code></td>
+<td>Lock tokens in Vaultio</td>
+</tr>
+<tr>
+<td><code>make withdraw</code></td>
+<td>Withdraw tokens from Vaultio</td>
+</tr>
+<tr>
+<td><code>make demo</code></td>
+<td>Run full demo workflow</td>
 </tr>
 </tbody>
 </table>
@@ -326,11 +544,15 @@ make deploy-mock
 
 ## Frontend Setup
 
+> 📝 **This section is the same for both Docker and Manual setup.**
+
 ### 1. Configure Contract Address
+
+After deploying the Vaultio contract, you need to configure the frontend with the contract address.
 
 **Option 1: Environment Variable (Recommended)**
 
-Update `frontend/.env.local`:
+Create or update `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_VAULTIO_ADDRESS=0xYourDeployedContractAddress
@@ -345,7 +567,54 @@ Update `frontend/src/lib/contracts.ts`:
 export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 ```
 
-### 2. Configure Network
+### 2. Access the Frontend
+
+<table>
+<tr>
+<td width="50%">
+
+**Docker Setup**
+
+The frontend starts automatically with `make up`.
+
+Access at: **http://localhost:3000**
+
+</td>
+<td width="50%">
+
+**Manual Setup**
+
+```bash
+cd frontend
+pnpm dev
+```
+
+Access at: **http://localhost:3000**
+
+</td>
+</tr>
+</table>
+
+### 3. Connect Wallet
+
+1. Open **http://localhost:3000** in your browser
+2. Click "Connect Wallet"
+3. Select MetaMask
+4. Ensure you're connected to the **Hardhat Local** network
+5. Select an imported test account
+
+---
+
+## Network Configuration
+
+### Switching Networks in the Frontend
+
+The application supports multiple networks. To switch networks:
+
+1. **In MetaMask:** Switch to the desired network (Hardhat, Sepolia, Mainnet)
+2. **In the App:** The app automatically detects network changes via Wagmi
+
+### Supported Networks
 
 <table>
 <thead>
@@ -358,8 +627,8 @@ export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 </thead>
 <tbody>
 <tr>
-<td><strong>Hardhat</strong></td>
-<td>http://127.0.0.1:8545</td>
+<td><strong>Hardhat Local</strong></td>
+<td><code>http://127.0.0.1:8545</code></td>
 <td>31337</td>
 <td>Local development</td>
 </tr>
@@ -370,7 +639,7 @@ export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 <td>Testnet</td>
 </tr>
 <tr>
-<td><strong>Mainnet</strong></td>
+<td><strong>Ethereum Mainnet</strong></td>
 <td>Public RPC</td>
 <td>1</td>
 <td>Production</td>
@@ -378,46 +647,10 @@ export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 </tbody>
 </table>
 
-Network configuration is in `frontend/src/lib/wagmi.ts`.
-
-### 3. Run Frontend Development Server
-
-```bash
-cd frontend
-pnpm dev
-```
-
-Application available at: **http://localhost:3000**
-
-### 4. Build for Production
-
-```bash
-cd frontend
-pnpm build
-pnpm start
-```
-
----
-
-## Configuration
-
-### Contract Address Configuration
-
-**Configuration Priority:**
-
-1. Environment variable: `NEXT_PUBLIC_VAULTIO_ADDRESS`
-2. Fallback: Default address in `frontend/src/lib/contracts.ts`
-
-**To update after deployment:**
-
-1. Copy deployed contract address from deployment output
-2. Add/update `NEXT_PUBLIC_VAULTIO_ADDRESS` in `frontend/.env.local`
-3. Restart frontend development server
-
-### Network Configuration
+### Adding a New Network
 
 <details>
-<summary><b>Frontend Network Setup</b></summary>
+<summary><b>Frontend Configuration</b></summary>
 
 Edit `frontend/src/lib/wagmi.ts`:
 
@@ -438,7 +671,7 @@ export const config = getDefaultConfig({
 </details>
 
 <details>
-<summary><b>Contract Network Setup</b></summary>
+<summary><b>Contracts Configuration</b></summary>
 
 Edit `contracts/hardhat.config.ts`:
 
@@ -454,125 +687,111 @@ networks: {
 
 </details>
 
+### Sepolia Testnet Deployment
+
+<details>
+<summary><b>Environment Setup for Sepolia</b></summary>
+
+Create a `.env` file in the `contracts/` directory:
+
+```env
+PRIVATE_KEY=your_private_key_here
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your_api_key
+ETHERSCAN_API_KEY=your_etherscan_api_key
+```
+
+> ⚠️ **Security Note:** Never commit your `.env` file to version control.
+
+</details>
+
+**Deployment Commands:**
+
+<table>
+<thead>
+<tr>
+<th>Setup</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Docker</strong></td>
+<td><code>make deploy-sepolia</code> (from root)</td>
+</tr>
+<tr>
+<td><strong>Manual</strong></td>
+<td><code>make deploy-sepolia</code> (from contracts/)</td>
+</tr>
+</tbody>
+</table>
+
 ---
 
 ## Usage Examples
 
 ### Complete Workflow: Approve → Lock → Withdraw
 
-**Workflow Overview:**
-
 <table>
 <tr>
 <td width="33%">
 
-<strong>Step 1: Approve</strong>  
+**Step 1: Approve**  
 Grant permission to spend tokens
 
 </td>
 <td width="33%">
 
-<strong>Step 2: Lock</strong>  
+**Step 2: Lock**  
 Lock tokens for duration
 
 </td>
 <td width="33%">
 
-<strong>Step 3: Withdraw</strong>  
+**Step 3: Withdraw**  
 Withdraw after expiration
 
 </td>
 </tr>
 </table>
 
-#### Step 1: Approve Tokens
+#### Using Command Line
 
-**Command Line:**
+<table>
+<tr>
+<th>Action</th>
+<th>Docker (from root)</th>
+<th>Manual (from contracts/)</th>
+</tr>
+<tr>
+<td><strong>Approve</strong></td>
+<td><code>make approve AMOUNT=1000</code></td>
+<td><code>make approve AMOUNT=1000</code></td>
+</tr>
+<tr>
+<td><strong>Lock</strong></td>
+<td><code>make lock AMOUNT=100 DURATION=5</code></td>
+<td><code>make lock AMOUNT=100 DURATION=5</code></td>
+</tr>
+<tr>
+<td><strong>Withdraw</strong></td>
+<td><code>make withdraw LOCK_ID=0</code></td>
+<td><code>make withdraw LOCK_ID=0</code></td>
+</tr>
+<tr>
+<td><strong>Full Demo</strong></td>
+<td><code>make demo</code></td>
+<td><code>make demo</code></td>
+</tr>
+</table>
 
-```bash
-cd contracts
+#### Using the Frontend
 
-# Using Makefile
-make approve AMOUNT=1000
+1. **Connect your wallet** and switch to Hardhat network
+2. **Approve tokens:** Enter amount and click "Approve"
+3. **Lock tokens:** Enter amount, set duration (in minutes), click "Lock"
+4. **Withdraw:** After lock expires, click "Withdraw" on the lock entry
 
-# Or using script directly
-TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=1000 \
-  npx hardhat run scripts/approve.ts --network localhost
-```
-
-**Via Frontend:**
-
-<ol>
-<li>Connect your wallet</li>
-<li>Navigate to the dashboard</li>
-<li>Select a token and enter the amount to approve</li>
-<li>Click "Approve"</li>
-</ol>
-
-#### Step 2: Lock Tokens
-
-**Command Line:**
-
-```bash
-cd contracts
-
-# Using Makefile
-make lock AMOUNT=100 DURATION=5
-
-# Or using script directly
-TOKEN_ADDRESS=0x... VAULTIO_ADDRESS=0x... AMOUNT=100 DURATION=5 \
-  npx hardhat run scripts/lock.ts --network localhost
-```
-
-**Via Frontend:**
-
-<ol>
-<li>Ensure tokens are approved</li>
-<li>Enter the amount to lock</li>
-<li>Specify the lock duration in minutes</li>
-<li>Click "Lock Tokens"</li>
-<li>Confirm the transaction in your wallet</li>
-</ol>
-
-#### Step 3: Withdraw Tokens
-
-**Command Line:**
-
-```bash
-cd contracts
-
-# Using Makefile
-make withdraw LOCK_ID=0
-
-# Or using script directly
-VAULTIO_ADDRESS=0x... LOCK_ID=0 \
-  npx hardhat run scripts/withdraw.ts --network localhost
-```
-
-**Via Frontend:**
-
-<ol>
-<li>Navigate to the dashboard</li>
-<li>View your active locks in the table</li>
-<li>Click "Withdraw" on an eligible lock</li>
-<li>Confirm the transaction in your wallet</li>
-</ol>
-
-### Quick Demo Script
-
-**Run Complete Demo:**
-
-```bash
-cd contracts
-
-# Deploy mock token, mint tokens, approve, and lock
-make demo
-
-# Wait for lock period to expire, then withdraw
-make withdraw LOCK_ID=0
-```
-
-### Script Parameters
+### Script Parameters Reference
 
 <table>
 <thead>
@@ -584,7 +803,25 @@ make withdraw LOCK_ID=0
 </thead>
 <tbody>
 <tr>
-<td><strong>Approve</strong></td>
+<td><strong>deploy-mock</strong></td>
+<td>
+<code>TOKEN_NAME</code> - Token name<br>
+<code>TOKEN_SYMBOL</code> - Token symbol<br>
+<code>TOKEN_DECIMALS</code> - Token decimals
+</td>
+<td>Mock Token<br>MTK<br>6</td>
+</tr>
+<tr>
+<td><strong>mint</strong></td>
+<td>
+<code>TOKEN_ADDRESS</code> - Token address<br>
+<code>RECIPIENT</code> - Recipient address<br>
+<code>AMOUNT</code> - Amount to mint
+</td>
+<td>From deployed files<br>First Hardhat account<br>1000</td>
+</tr>
+<tr>
+<td><strong>approve</strong></td>
 <td>
 <code>TOKEN_ADDRESS</code> - Token address<br>
 <code>VAULTIO_ADDRESS</code> - Contract address<br>
@@ -593,7 +830,7 @@ make withdraw LOCK_ID=0
 <td>From deployed files<br>From deployment<br>1000</td>
 </tr>
 <tr>
-<td><strong>Lock</strong></td>
+<td><strong>lock</strong></td>
 <td>
 <code>TOKEN_ADDRESS</code> - Token address<br>
 <code>VAULTIO_ADDRESS</code> - Contract address<br>
@@ -603,7 +840,7 @@ make withdraw LOCK_ID=0
 <td>From deployed files<br>From deployment<br>100<br>1</td>
 </tr>
 <tr>
-<td><strong>Withdraw</strong></td>
+<td><strong>withdraw</strong></td>
 <td>
 <code>VAULTIO_ADDRESS</code> - Contract address<br>
 <code>LOCK_ID</code> - Lock ID
@@ -615,54 +852,69 @@ make withdraw LOCK_ID=0
 
 ---
 
+## Screenshots
+
+<details>
+<summary><b>View Application Screenshots</b></summary>
+
+### Landing Page
+
+<!-- ![Landing Page](./screenshots/landing.png) -->
+*Coming soon*
+
+### Dashboard
+
+<!-- ![Dashboard](./screenshots/dashboard.png) -->
+*Coming soon*
+
+### Lock Tokens
+
+<!-- ![Lock Tokens](./screenshots/lock.png) -->
+*Coming soon*
+
+### Withdraw Tokens
+
+<!-- ![Withdraw Tokens](./screenshots/withdraw.png) -->
+*Coming soon*
+
+### MetaMask Configuration
+
+<!-- ![MetaMask Config](./screenshots/metamask.png) -->
+*Coming soon*
+
+</details>
+
+---
+
 ## Development
 
 ### Contract Development
 
 <table>
 <tr>
-<td width="50%">
-
-<strong>Compile Contracts</strong>
-
-```bash
-cd contracts
-make compile
-```
-
-</td>
-<td width="50%">
-
-<strong>Run Tests</strong>
-
-```bash
-cd contracts
-make test
-```
-
-</td>
+<th>Action</th>
+<th>Docker (from root)</th>
+<th>Manual (from contracts/)</th>
 </tr>
 <tr>
-<td>
-
-<strong>Run Coverage</strong>
-
-```bash
-cd contracts
-npx hardhat coverage
-```
-
-</td>
-<td>
-
-<strong>Clean Build</strong>
-
-```bash
-cd contracts
-make clean
-```
-
-</td>
+<td><strong>Compile</strong></td>
+<td><code>make compile</code></td>
+<td><code>make compile</code></td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td><code>make test</code></td>
+<td><code>make test</code></td>
+</tr>
+<tr>
+<td><strong>Coverage</strong></td>
+<td><code>make shell-hardhat</code> then <code>pnpm exec hardhat coverage</code></td>
+<td><code>npx hardhat coverage</code></td>
+</tr>
+<tr>
+<td><strong>Clean</strong></td>
+<td><code>make clean</code></td>
+<td><code>make clean</code></td>
 </tr>
 </table>
 
@@ -672,7 +924,7 @@ make clean
 <tr>
 <td width="50%">
 
-<strong>Start Dev Server</strong>
+**Start Dev Server**
 
 ```bash
 cd frontend
@@ -682,7 +934,7 @@ pnpm dev
 </td>
 <td width="50%">
 
-<strong>Run Linter</strong>
+**Run Linter**
 
 ```bash
 cd frontend
@@ -694,7 +946,7 @@ pnpm lint
 <tr>
 <td>
 
-<strong>Format Code</strong>
+**Format Code**
 
 ```bash
 cd frontend
@@ -704,106 +956,17 @@ pnpm format
 </td>
 <td>
 
-<strong>Check Formatting</strong>
+**Build for Production**
 
 ```bash
 cd frontend
-pnpm format:check
+pnpm build
+pnpm start
 ```
 
 </td>
 </tr>
 </table>
-
-### Available Makefile Commands
-
-<details>
-<summary><b>Contract Commands</b></summary>
-
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>make compile</code></td>
-<td>Compile contracts</td>
-</tr>
-<tr>
-<td><code>make test</code></td>
-<td>Run tests</td>
-</tr>
-<tr>
-<td><code>make clean</code></td>
-<td>Clean build artifacts</td>
-</tr>
-<tr>
-<td><code>make node</code></td>
-<td>Start Hardhat node</td>
-</tr>
-<tr>
-<td><code>make stop-node</code></td>
-<td>Stop Hardhat node</td>
-</tr>
-<tr>
-<td><code>make deploy-local</code></td>
-<td>Deploy to localhost</td>
-</tr>
-<tr>
-<td><code>make deploy-sepolia</code></td>
-<td>Deploy to Sepolia</td>
-</tr>
-<tr>
-<td><code>make verify</code></td>
-<td>Verify contract on Etherscan</td>
-</tr>
-</tbody>
-</table>
-
-</details>
-
-<details>
-<summary><b>Interaction Commands</b></summary>
-
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>make deploy-mock</code></td>
-<td>Deploy mock ERC-20 token</td>
-</tr>
-<tr>
-<td><code>make mint</code></td>
-<td>Mint tokens to an address</td>
-</tr>
-<tr>
-<td><code>make approve</code></td>
-<td>Approve tokens for Vaultio</td>
-</tr>
-<tr>
-<td><code>make lock</code></td>
-<td>Lock tokens in Vaultio</td>
-</tr>
-<tr>
-<td><code>make withdraw</code></td>
-<td>Withdraw tokens from Vaultio</td>
-</tr>
-<tr>
-<td><code>make demo</code></td>
-<td>Run complete demo workflow</td>
-</tr>
-</tbody>
-</table>
-
-</details>
 
 ---
 
@@ -832,7 +995,42 @@ pnpm format:check
 </tr>
 </table>
 
-**Important:** Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
+> ⚠️ **Important:** Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
+
+---
+
+## Troubleshooting
+
+<details>
+<summary><b>Common Issues</b></summary>
+
+### MetaMask "Nonce too high" Error
+
+This happens when MetaMask's transaction count is out of sync with the Hardhat network (often after restarting the node).
+
+**Solution:** In MetaMask, go to Settings → Advanced → Clear activity tab data
+
+### Docker Container Won't Start
+
+```bash
+# Stop all containers and rebuild
+make down
+make up-build
+```
+
+### Frontend Can't Connect to Hardhat Node
+
+1. Ensure Hardhat node is running (`make node`)
+2. Check RPC URL is `http://127.0.0.1:8545`
+3. Ensure MetaMask is configured with Chain ID `31337`
+
+### Contract Deployment Fails
+
+1. Ensure Hardhat node is running
+2. Check for sufficient funds in the deploying account
+3. Try cleaning and recompiling: `make clean && make compile`
+
+</details>
 
 ---
 
@@ -850,6 +1048,8 @@ For issues, questions, or contributions, please open an issue in the repository.
 
 <div align="center">
 
-<sub>Built with Solidity, Hardhat, Next.js, and Web3 technologies</sub>
+**Built with Solidity, Hardhat, Next.js, Docker, and Web3 technologies**
+
+<sub>⭐ Star this repo if you find it helpful!</sub>
 
 </div>

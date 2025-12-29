@@ -38,7 +38,7 @@ help:
 	@echo "  make demo            - Run full demo (deploy-mock, mint, approve, lock)"
 	@echo ""
 	@echo "Environment Variables for Demo:"
-	@echo "  TOKEN_NAME, TOKEN_SYMBOL    - For deploy-mock"
+	@echo "  TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS  - For deploy-mock"
 	@echo "  TOKEN_ADDRESS, RECIPIENT    - For mint"
 	@echo "  TOKEN_ADDRESS, AMOUNT       - For approve/lock"
 	@echo "  VAULTIO_ADDRESS, LOCK_ID    - For withdraw"
@@ -49,7 +49,7 @@ up:
 
 # Start all services with rebuild
 up-build:
-	docker compose up --build
+	docker compose up -d --build
 
 # Stop all services
 down:
@@ -113,9 +113,9 @@ verify:
 
 # Deploy a MockERC20 token
 # Usage: make deploy-mock
-# Example: make deploy-mock TOKEN_NAME="Ziku Token" TOKEN_SYMBOL="ZKT"
+# Example: make deploy-mock TOKEN_NAME="Ziku Token" TOKEN_SYMBOL="ZKT" TOKEN_DECIMALS=18
 deploy-mock:
-	docker compose exec -e TOKEN_NAME="$(TOKEN_NAME)" -e TOKEN_SYMBOL="$(TOKEN_SYMBOL)" \
+	docker compose exec -e TOKEN_NAME="$(TOKEN_NAME)" -e TOKEN_SYMBOL="$(TOKEN_SYMBOL)" -e TOKEN_DECIMALS="$(TOKEN_DECIMALS)" \
 		hardhat pnpm exec hardhat run scripts/deploy-mock.ts --network localhost
 
 # Mint tokens to an address
