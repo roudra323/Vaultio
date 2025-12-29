@@ -58,6 +58,20 @@ export const getVaultioContract = (signer: ethers.Signer, chainId: number): ethe
 };
 
 /**
+ * Get a read-only Vaultio contract instance with a provider
+ * Used for event listening and read operations (no signing required)
+ * @param provider - The ethers provider to use
+ * @param chainId - The chain ID to get the contract address for
+ */
+export const getVaultioContractReadOnly = (
+  provider: ethers.providers.Provider,
+  chainId: number
+): ethers.Contract => {
+  const address = getVaultioAddress(chainId);
+  return new ethers.Contract(address, VAULTIO_ABI, provider);
+};
+
+/**
  * Get an ERC20 contract instance with a signer
  */
 export const getERC20Contract = (tokenAddress: string, signer: ethers.Signer): ethers.Contract => {
