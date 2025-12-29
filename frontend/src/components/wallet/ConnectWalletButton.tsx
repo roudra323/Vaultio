@@ -3,6 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ChevronRight, Copy, LogOut } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 export const ConnectWalletButton = () => {
   const [copied, setCopied] = useState(false);
@@ -35,7 +36,7 @@ export const ConnectWalletButton = () => {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/25 flex items-center gap-2 rounded-full bg-gradient-to-r px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:shadow-lg">
+                    className="from-vaultio-purple to-vaultio-cyan hover:shadow-vaultio-purple/25 flex items-center gap-2 rounded-full bg-linear-to-r px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:shadow-lg">
                     Connect Wallet
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -77,10 +78,13 @@ export const ConnectWalletButton = () => {
                     onClick={openAccountModal}
                     className="from-vaultio-purple to-vaultio-cyan hover:ring-vaultio-cyan flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br transition-all hover:ring-2">
                     {account.ensAvatar ? (
-                      <img
+                      <Image
                         alt={account.displayName}
                         src={account.ensAvatar}
+                        width={40}
+                        height={40}
                         className="h-full w-full object-cover"
+                        unoptimized
                       />
                     ) : (
                       <span className="text-lg">🦊</span>
