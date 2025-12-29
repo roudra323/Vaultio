@@ -76,7 +76,7 @@ export const ConnectWalletButton = () => {
                   {/* Avatar */}
                   <button
                     onClick={openAccountModal}
-                    className="from-vaultio-purple to-vaultio-cyan hover:ring-vaultio-cyan flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br transition-all hover:ring-2">
+                    className="from-vaultio-purple to-vaultio-cyan hover:ring-vaultio-cyan flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-linear-to-br transition-all hover:ring-2">
                     {account.ensAvatar ? (
                       <Image
                         alt={account.displayName}
