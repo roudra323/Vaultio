@@ -291,7 +291,7 @@ Vaultio/
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/roudra323/Vaultio
 cd Vaultio
 
 # Start all Docker containers
@@ -332,6 +332,10 @@ make deploy-mock TOKEN_NAME="Test Token" TOKEN_SYMBOL="TEST" TOKEN_DECIMALS=18
 # Mint tokens to your address
 make mint
 ```
+
+#### Step 6: Configure Frontend
+
+Now configure the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
 
 #### Docker Commands Reference
 
@@ -469,6 +473,10 @@ cd contracts
 make mint
 ```
 
+#### Step 6: Configure Frontend
+
+Now configure the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
+
 #### Manual Commands Reference
 
 <table>
@@ -548,21 +556,16 @@ make mint
 
 After deploying the Vaultio contract, you need to configure the frontend with the contract address.
 
-**Option 1: Environment Variable (Recommended)**
+**Environment Variable**
 
 Create or update `frontend/.env.local`:
 
 ```env
-NEXT_PUBLIC_VAULTIO_ADDRESS=0xYourDeployedContractAddress
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
-```
-
-**Option 2: Direct Configuration**
-
-Update `frontend/src/lib/contracts.ts`:
-
-```typescript
-export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=
+# Hardhat Local (Chain ID: 31337)
+NEXT_PUBLIC_VAULTIO_ADDRESS_LOCAL=0x5FbDB2315678afecb367f032d93F642f64180aa3
+# Sepolia Testnet (Chain ID: 11155111)
+NEXT_PUBLIC_VAULTIO_ADDRESS_SEPOLIA=0x71Dbf9C7e101FFDDB68e0C6B010099C2e39f998c
 ```
 
 ### 2. Access the Frontend
@@ -573,7 +576,7 @@ export const VAULTIO_ADDRESS = "0xYourDeployedContractAddress";
 
 **Docker Setup**
 
-The frontend starts automatically with `make up`.
+The frontend starts automatically with previously ran command `make up`.
 
 Access at: **http://localhost:3000**
 
