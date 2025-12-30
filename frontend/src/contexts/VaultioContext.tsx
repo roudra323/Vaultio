@@ -9,47 +9,21 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { useAccount, useWalletClient } from "wagmi";
-import { toast } from "sonner";
-import {
-  walletClientToSigner,
-  getVaultioContract,
-  getERC20Contract,
-  parseTokenAmount,
-  getTokenDecimals,
-} from "@/lib/ethers";
-import { formatTransactionError } from "@/lib/utils";
-import { VAULTIO_ADDRESS } from "@/lib/contracts";
-import type { ethers } from "ethers";
+import { useAccount, useWalletClient, useChainId } from "wagmi";
+import { walletClientToSigner, getVaultioContract, getTokenDecimals } from "@/lib/ethers";
+import { useVaultioEvents } from "@/hooks/useVaultioEvents";
+import type { Lock } from "@/types";
 
-// Lock type using Ethers BigNumber
-export type Lock = {
-  token: string;
-  amount: ethers.BigNumber;
-  startTime: ethers.BigNumber;
-  unlockTime: ethers.BigNumber;
-  withdrawn: boolean;
-};
-
-// Context state type
+// Context state type - simplified to only data management
 type VaultioContextState = {
   // Data
   userLocks: Lock[];
   isLoadingLocks: boolean;
   tokenDecimals: Record<string, number>;
 
-  // Transaction states
-  isApproving: boolean;
-  isLocking: boolean;
-  isWithdrawing: boolean;
-
   // Actions
   fetchUserLocks: () => Promise<void>;
-  getDecimals: (tokenAddress: string) => Promise<number>;
-  checkAllowance: (tokenAddress: string, amount: string) => Promise<boolean>;
-  approveTokens: (tokenAddress: string, amount: string) => Promise<boolean>;
-  lockTokens: (tokenAddress: string, amount: string, durationInMinutes: number) => Promise<boolean>;
-  withdrawTokens: (lockId: number) => Promise<boolean>;
+  getDecimalsForToken: (tokenAddress: string) => number;
 };
 
 // Create context with default values
@@ -63,13 +37,11 @@ type VaultioProviderProps = {
 export const VaultioProvider = ({ children }: VaultioProviderProps) => {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const chainId = useChainId();
 
   // State
   const [userLocks, setUserLocks] = useState<Lock[]>([]);
   const [isLoadingLocks, setIsLoadingLocks] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
-  const [isLocking, setIsLocking] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [tokenDecimals, setTokenDecimals] = useState<Record<string, number>>({});
 
   // Get signer from wallet client
@@ -80,43 +52,22 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     return walletClientToSigner(walletClient);
   }, [walletClient]);
 
-  // Get token decimals with caching
-  const getDecimals = useCallback(
-    async (tokenAddress: string): Promise<number> => {
+  /**
+   * Get decimals for a specific token from cache
+   */
+  const getDecimalsForToken = useCallback(
+    (tokenAddress: string): number => {
       const normalizedAddress = tokenAddress.toLowerCase();
-
-      // Check cache first
-      if (tokenDecimals[normalizedAddress] !== undefined) {
-        return tokenDecimals[normalizedAddress];
-      }
-
-      // Fetch from contract if not cached
-      if (!walletClient) {
-        return 18; // Default to 18 if no wallet connected
-      }
-
-      try {
-        const signer = getSigner();
-        const decimals = await getTokenDecimals(tokenAddress, signer);
-
-        // Update cache
-        setTokenDecimals((prev) => ({
-          ...prev,
-          [normalizedAddress]: decimals,
-        }));
-
-        return decimals;
-      } catch (error) {
-        console.error("Error fetching token decimals:", error);
-        return 18; // Default to 18 on error
-      }
+      return tokenDecimals[normalizedAddress] ?? 18;
     },
-    [tokenDecimals, walletClient, getSigner]
+    [tokenDecimals]
   );
 
-  // Fetch user locks
+  /**
+   * Fetch user locks from the contract
+   */
   const fetchUserLocks = useCallback(async () => {
-    if (!address || !walletClient) {
+    if (!address || !walletClient || !chainId) {
       setUserLocks([]);
       return;
     }
@@ -124,7 +75,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     setIsLoadingLocks(true);
     try {
       const signer = getSigner();
-      const vaultioContract = getVaultioContract(signer);
+      const vaultioContract = getVaultioContract(signer, chainId);
       const locks = await vaultioContract.getUserLocks(address);
 
       // Convert the array of structs to our Lock type
@@ -162,7 +113,7 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     } finally {
       setIsLoadingLocks(false);
     }
-  }, [address, walletClient, getSigner, tokenDecimals]);
+  }, [address, walletClient, chainId, getSigner, tokenDecimals]);
 
   // Fetch locks when wallet connects or address changes
   useEffect(() => {
@@ -173,139 +124,27 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
     }
   }, [isConnected, address, walletClient, fetchUserLocks]);
 
-  // Check allowance
-  const checkAllowance = useCallback(
-    async (tokenAddress: string, amount: string): Promise<boolean> => {
-      if (!address || !walletClient) return true;
+  /**
+   * Event handlers for real-time updates
+   * When events are emitted, automatically refresh the locks list
+   *
+   * Note: This provides real-time updates via contract events.
+   * Components may also manually call fetchUserLocks() as a fallback,
+   * creating a robust dual-update system for better UX and reliability.
+   */
+  const handleTokenLocked = useCallback(() => {
+    console.log("TokenLocked event detected - refreshing locks...");
+    fetchUserLocks();
+  }, [fetchUserLocks]);
 
-      try {
-        const signer = getSigner();
-        const tokenContract = getERC20Contract(tokenAddress, signer);
-        const allowance = await tokenContract.allowance(address, VAULTIO_ADDRESS);
+  const handleTokenWithdrawn = useCallback(() => {
+    console.log("TokenWithdrawn event detected - refreshing locks...");
+    fetchUserLocks();
+  }, [fetchUserLocks]);
 
-        // Get token decimals dynamically
-        const decimals = await getDecimals(tokenAddress);
-        const amountInWei = parseTokenAmount(amount, decimals);
-
-        console.log("allowance", allowance.toString());
-        console.log("amountInWei", amountInWei.toString());
-        console.log("decimals", decimals);
-        console.log("Contract Address", VAULTIO_ADDRESS);
-        console.log("Token Address", tokenAddress);
-        console.log("Address", address);
-
-        return allowance.lt(amountInWei);
-      } catch (error) {
-        console.error("Error checking allowance:", error);
-        return true;
-      }
-    },
-    [address, walletClient, getSigner, getDecimals]
-  );
-
-  // Approve tokens
-  const approveTokens = useCallback(
-    async (tokenAddress: string, amount: string): Promise<boolean> => {
-      if (!address || !walletClient) {
-        toast.error("Please connect your wallet");
-        return false;
-      }
-
-      setIsApproving(true);
-      try {
-        const signer = getSigner();
-        const tokenContract = getERC20Contract(tokenAddress, signer);
-
-        // Get token decimals dynamically
-        const decimals = await getDecimals(tokenAddress);
-        const amountInWei = parseTokenAmount(amount, decimals);
-
-        const tx = await tokenContract.approve(VAULTIO_ADDRESS, amountInWei);
-        toast.loading("Approving tokens...", { id: "approve" });
-
-        await tx.wait();
-        toast.success("Token approved successfully", { id: "approve" });
-
-        return true;
-      } catch (error) {
-        toast.error(formatTransactionError(error), { id: "approve" });
-        return false;
-      } finally {
-        setIsApproving(false);
-      }
-    },
-    [address, walletClient, getSigner, getDecimals]
-  );
-
-  // Lock tokens
-  const lockTokens = useCallback(
-    async (tokenAddress: string, amount: string, durationInMinutes: number): Promise<boolean> => {
-      if (!address || !walletClient) {
-        toast.error("Please connect your wallet");
-        return false;
-      }
-
-      setIsLocking(true);
-      try {
-        const signer = getSigner();
-        const vaultioContract = getVaultioContract(signer);
-
-        // Get token decimals dynamically
-        const decimals = await getDecimals(tokenAddress);
-        const amountInWei = parseTokenAmount(amount, decimals);
-
-        const tx = await vaultioContract.lockTokens(tokenAddress, amountInWei, durationInMinutes);
-
-        toast.loading("Locking tokens...", { id: "lock" });
-        await tx.wait();
-
-        toast.success("Tokens locked successfully!", { id: "lock" });
-        await fetchUserLocks();
-
-        return true;
-      } catch (error) {
-        console.log("Error locking tokens:", error);
-        toast.error(formatTransactionError(error), { id: "lock" });
-        return false;
-      } finally {
-        setIsLocking(false);
-      }
-    },
-    [address, walletClient, getSigner, fetchUserLocks, getDecimals]
-  );
-
-  // Withdraw tokens
-  const withdrawTokens = useCallback(
-    async (lockId: number): Promise<boolean> => {
-      if (!address || !walletClient) {
-        toast.error("Please connect your wallet");
-        return false;
-      }
-
-      setIsWithdrawing(true);
-      try {
-        const signer = getSigner();
-        const vaultioContract = getVaultioContract(signer);
-
-        const tx = await vaultioContract.withdrawTokens(lockId);
-
-        toast.loading("Withdrawing tokens...", { id: "withdraw" });
-        await tx.wait();
-
-        toast.success("Tokens withdrawn successfully!", { id: "withdraw" });
-        await fetchUserLocks();
-
-        return true;
-      } catch (error) {
-        console.log("Error withdrawing tokens:", error);
-        toast.error(formatTransactionError(error), { id: "withdraw" });
-        return false;
-      } finally {
-        setIsWithdrawing(false);
-      }
-    },
-    [address, walletClient, getSigner, fetchUserLocks]
-  );
+  // Set up event listeners for real-time updates
+  // Filters events by connected user address for efficient updates
+  useVaultioEvents(handleTokenLocked, handleTokenWithdrawn, isConnected && !!address);
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo<VaultioContextState>(
@@ -313,36 +152,22 @@ export const VaultioProvider = ({ children }: VaultioProviderProps) => {
       userLocks,
       isLoadingLocks,
       tokenDecimals,
-      isApproving,
-      isLocking,
-      isWithdrawing,
       fetchUserLocks,
-      getDecimals,
-      checkAllowance,
-      approveTokens,
-      lockTokens,
-      withdrawTokens,
+      getDecimalsForToken,
     }),
-    [
-      userLocks,
-      isLoadingLocks,
-      tokenDecimals,
-      isApproving,
-      isLocking,
-      isWithdrawing,
-      fetchUserLocks,
-      getDecimals,
-      checkAllowance,
-      approveTokens,
-      lockTokens,
-      withdrawTokens,
-    ]
+    [userLocks, isLoadingLocks, tokenDecimals, fetchUserLocks, getDecimalsForToken]
   );
 
   return <VaultioContext.Provider value={value}>{children}</VaultioContext.Provider>;
 };
 
-// Custom hook to use the Vaultio context
+/**
+ * Hook to access the Vaultio context
+ * For most use cases, prefer the specialized hooks:
+ * - useUserLocks: For reading locks data
+ * - useLockTokens: For locking tokens
+ * - useWithdraw: For withdrawing tokens
+ */
 export const useVaultioContext = (): VaultioContextState => {
   const context = useContext(VaultioContext);
 
