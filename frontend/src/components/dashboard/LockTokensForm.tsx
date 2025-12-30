@@ -16,15 +16,16 @@ import type { Address, DurationOption } from "@/types";
 
 // Convert Chosen Duration to Minutes for the contract
 const DURATION_OPTIONS: DurationOption[] = [
-  { label: "1 min", value: "1" },
-  { label: "10 mins", value: "10" },
-  { label: "30 mins", value: "30" },
-  { label: "1 hour", value: "60" },
-  { label: "6 hours", value: "360" },
-  { label: "12 hours", value: "720" },
-  { label: "1 day", value: "1440" },
-  { label: "7 days", value: "10080" },
-  { label: "30 days", value: "43200" },
+  { label: "1 minute", value: "1" },
+  { label: "5 minutes", value: "5" },
+  { label: "10 minutes", value: "10" },
+  { label: "30 minutes", value: "30" },
+  { label: "60 minutes", value: "60" },
+  { label: "360 minutes", value: "360" },
+  { label: "720 minutes", value: "720" },
+  { label: "1440 minutes", value: "1440" },
+  { label: "10080 minutes", value: "10080" },
+  { label: "43200 minutes", value: "43200" },
 ];
 
 type LockTokensFormProps = {
