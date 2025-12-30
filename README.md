@@ -982,6 +982,8 @@ RainbowKit automatically handles network switching. See [Network Configuration](
 
 ### Contract Development
 
+> 📚 **For detailed contract documentation** including security measures, best practices, test coverage, and gas optimization, see the [Smart Contract README](./contracts/README.md).
+
 <table>
 <tr>
 <th>Action</th>
