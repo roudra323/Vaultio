@@ -56,6 +56,7 @@ export const useLockTokens = (onSuccess?: () => void) => {
         return allowance.lt(amountInWei);
       } catch (error) {
         console.error("Error checking allowance:", error);
+        toast.error(formatTransactionError(error), { id: "check-approval" });
         return true;
       }
     },

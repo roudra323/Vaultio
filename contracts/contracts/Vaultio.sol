@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
+ * @author roudra323 | https://github.com/roudra323
  * @title Vaultio
  * @dev Token locking vault with time-based withdrawals
  * @notice Users can lock ERC-20 tokens for a specified duration
