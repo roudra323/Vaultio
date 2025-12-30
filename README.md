@@ -9,6 +9,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black.svg)](https://nextjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000.svg?logo=vercel)](https://vaultio-nine.vercel.app)
+
 </div>
 
 ---
@@ -69,6 +71,7 @@
 
 ## Quick Navigation
 
+- **Live Demo:** [https://vaultio-nine.vercel.app](https://vaultio-nine.vercel.app) (Sepolia Testnet)
 - **Local dev (fast path):** [Docker Setup](#docker-setup-recommended) → [Frontend Setup](#frontend-setup)
 - **Sepolia deploy/verify:** [Sepolia Deployment](#sepolia-deployment) → [Deployed Contracts](#deployed-contracts-sepolia-testnet)
 - **Network switching (RainbowKit):** [Network Configuration](#network-configuration) → [Network Switching screenshots](#network-switching)
