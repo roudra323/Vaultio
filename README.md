@@ -33,15 +33,15 @@
       - [Step 1: Clone and Start Containers](#step-1-clone-and-start-containers)
       - [Step 2: Start Hardhat Node](#step-2-start-hardhat-node)
       - [Step 3: Deploy Contracts](#step-3-deploy-contracts)
-      - [Step 4: Deploy Mock ERC-20 Token (Optional)](#step-4-deploy-mock-erc-20-token-optional)
-      - [Step 5: Mint Test Tokens (Optional)](#step-5-mint-test-tokens-optional)
+      - [Step 4: Deploy Mock ERC-20 Token](#step-4-deploy-mock-erc-20-token)
+      - [Step 5: Mint Test Tokens](#step-5-mint-test-tokens)
       - [Step 6: Configure Frontend](#step-6-configure-frontend)
     - [Manual Setup](#manual-setup)
       - [Step 1: Clone and Install Dependencies](#step-1-clone-and-install-dependencies)
       - [Step 2: Start Hardhat Node](#step-2-start-hardhat-node-1)
       - [Step 3: Deploy Contracts](#step-3-deploy-contracts-1)
-      - [Step 4: Deploy Mock ERC-20 Token (Optional)](#step-4-deploy-mock-erc-20-token-optional-1)
-      - [Step 5: Mint Test Tokens (Optional)](#step-5-mint-test-tokens-optional-1)
+      - [Step 4: Deploy Mock ERC-20 Token (Optional)](#step-4-deploy-mock-erc-20-token-optional)
+      - [Step 5: Mint Test Tokens (Optional)](#step-5-mint-test-tokens-optional)
       - [Step 6: Configure Frontend](#step-6-configure-frontend-1)
   - [Frontend Setup](#frontend-setup)
     - [1. Configure Contract Address](#1-configure-contract-address)
@@ -318,6 +318,8 @@ Vaultio/
 
 ## Quick Start
 
+> 💡 **Recommendation:** For the best experience, start with a fresh Hardhat local node and import the first test wallet address (`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`) into MetaMask. This ensures consistent contract addresses and avoids nonce issues.
+
 ### Docker Setup (Recommended)
 
 > 🐳 All commands are run from the **project root directory**.
@@ -328,10 +330,18 @@ Vaultio/
 # Clone the repository
 git clone https://github.com/roudra323/Vaultio
 cd Vaultio
-
-# Start all Docker containers
-make up
 ```
+
+**(Recommended) Configure frontend env vars BEFORE building containers** so the values are baked into the frontend image.
+
+See: [Configure Contract Address](#1-configure-contract-address)
+
+
+```bash
+# Build & Start all Docker containers
+make up-build
+```
+
 
 #### Step 2: Start Hardhat Node
 
@@ -349,9 +359,9 @@ Keep this terminal running. You'll see output showing 20 test accounts with thei
 make deploy-local
 ```
 
-Save the deployed contract address from the output.
+Save the deployed contract address from the output (It will be this address : 0x5FbDB2315678afecb367f032d93F642f64180aa3).
 
-#### Step 4: Deploy Mock ERC-20 Token (Optional)
+#### Step 4: Deploy Mock ERC-20 Token
 
 ```bash
 # Deploy a mock token for testing (defaults: Mock Token, MTK, 6 decimals)
@@ -361,11 +371,15 @@ make deploy-mock
 make deploy-mock TOKEN_NAME="Test Token" TOKEN_SYMBOL="TEST" TOKEN_DECIMALS=18
 ```
 
-#### Step 5: Mint Test Tokens (Optional)
+#### Step 5: Mint Test Tokens
 
 ```bash
 # Mint tokens to your address
+# It will mint 1000 tokens to the first hardhat account (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)
 make mint
+
+# Or with custom token address, recipient, and amount
+make mint TOKEN_ADDRESS=0x... RECIPIENT=0x... AMOUNT=1000
 ```
 
 #### Step 6: Configure Frontend
@@ -617,7 +631,7 @@ NEXT_PUBLIC_VAULTIO_ADDRESS_SEPOLIA=0x71Dbf9C7e101FFDDB68e0C6B010099C2e39f998c
 
 **Docker Setup**
 
-The frontend starts automatically after running `make up`.
+The frontend starts automatically after running `make up-build`.
 
 Access at: **http://localhost:3000**
 
