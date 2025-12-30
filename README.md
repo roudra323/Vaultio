@@ -16,9 +16,6 @@
 
 ## Table of Contents
 
-<details>
-<summary><b>Click to expand</b></summary>
-
 - [Project Overview](#project-overview)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
@@ -31,12 +28,13 @@
   - [Manual Setup](#manual-setup)
 - [Frontend Setup](#frontend-setup)
 - [Network Configuration](#network-configuration)
+  - [Deployed Contracts (Sepolia Testnet)](#deployed-contracts-sepolia-testnet)
 - [Usage Examples](#usage-examples)
 - [Screenshots](#screenshots)
+  - [Application Features](#application-features)
+  - [Network Switching](#network-switching)
 - [Development](#development)
 - [Security Considerations](#security-considerations)
-
-</details>
 
 ---
 
@@ -609,12 +607,18 @@ Access at: **http://localhost:3000**
 
 ### Switching Networks in the Frontend
 
-The application supports multiple networks. To switch networks:
+The application uses **RainbowKit** which provides automatic network switching. Simply change your network in MetaMask, and RainbowKit will handle the transition seamlessly.
 
-1. **In MetaMask:** Switch to the desired network (Hardhat, Sepolia, Mainnet)
-2. **In the App:** The app automatically detects network changes via Wagmi
+**How it works:**
+1. Open your MetaMask wallet
+2. Switch to any supported network (Hardhat, Sepolia, or Mainnet)
+3. The frontend automatically detects and adapts to the network change
+
+> 💡 **See it in action:** Check out the [network switching screenshots](screenshots/network-change/) demonstrating the automatic network detection.
 
 ### Supported Networks
+
+The following networks are configured in `frontend/src/lib/wagmi.ts`:
 
 <table>
 <thead>
@@ -633,10 +637,10 @@ The application supports multiple networks. To switch networks:
 <td>Local development</td>
 </tr>
 <tr>
-<td><strong>Sepolia</strong></td>
+<td><strong>Sepolia Testnet</strong></td>
 <td>Public RPC</td>
 <td>11155111</td>
-<td>Testnet</td>
+<td>Testing & demos</td>
 </tr>
 <tr>
 <td><strong>Ethereum Mainnet</strong></td>
@@ -652,28 +656,34 @@ The application supports multiple networks. To switch networks:
 <details>
 <summary><b>Frontend Configuration</b></summary>
 
-Edit `frontend/src/lib/wagmi.ts`:
+To add a new network, edit `frontend/src/lib/wagmi.ts`:
 
 ```typescript
 import { mainnet, sepolia, hardhat, yourChain } from "wagmi/chains";
+import { http } from "wagmi";
 
 export const config = getDefaultConfig({
-  chains: [mainnet, sepolia, hardhat, yourChain],
+  appName: "Vaultio",
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
+  chains: [mainnet, sepolia, hardhat, yourChain], // Add your chain here
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
     [hardhat.id]: http("http://127.0.0.1:8545"),
-    [yourChain.id]: http("your_rpc_url"),
+    [yourChain.id]: http("your_rpc_url"), // Configure transport
   },
+  ssr: true,
 });
 ```
+
+RainbowKit will automatically handle network switching for the new chain.
 
 </details>
 
 <details>
 <summary><b>Contracts Configuration</b></summary>
 
-Edit `contracts/hardhat.config.ts`:
+To deploy to a new network, edit `contracts/hardhat.config.ts`:
 
 ```typescript
 networks: {
@@ -685,22 +695,46 @@ networks: {
 }
 ```
 
+Then set the required variables using Hardhat's secure configuration system (see below).
+
 </details>
 
 ### Sepolia Testnet Deployment
 
 <details>
-<summary><b>Environment Setup for Sepolia</b></summary>
+<summary><b>Secure Configuration with Hardhat Vars</b></summary>
 
-Create a `.env` file in the `contracts/` directory:
+This project uses **Hardhat's built-in configuration variables** instead of `.env` files for enhanced security. Set your credentials using:
 
-```env
-PRIVATE_KEY=your_private_key_here
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your_api_key
-ETHERSCAN_API_KEY=your_etherscan_api_key
+```bash
+cd contracts
+
+# Set your private key
+npx hardhat vars set PRIVATE_KEY
+
+# Set Sepolia RPC URL (get from Infura, Alchemy, etc.)
+npx hardhat vars set SEPOLIA_RPC_URL
+
+# Set Etherscan API key (for contract verification)
+npx hardhat vars set ETHERSCAN_API_KEY
 ```
 
-> ⚠️ **Security Note:** Never commit your `.env` file to version control.
+**Advantages:**
+- ✅ Credentials stored in Hardhat's encrypted configuration
+- ✅ No risk of accidentally committing secrets
+- ✅ Better security than plain text `.env` files
+
+**View configured variables:**
+```bash
+npx hardhat vars list
+```
+
+**Get a specific variable:**
+```bash
+npx hardhat vars get ETHERSCAN_API_KEY
+```
+
+> 📚 **Learn more:** [Hardhat Configuration Variables Documentation](https://hardhat.org/hardhat-runner/docs/guides/configuration-variables)
 
 </details>
 
@@ -724,6 +758,34 @@ ETHERSCAN_API_KEY=your_etherscan_api_key
 </tr>
 </tbody>
 </table>
+
+### Deployed Contracts (Sepolia Testnet)
+
+The following contracts have been deployed and verified on the Sepolia testnet:
+
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Address</th>
+<th>Etherscan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vaultio</strong></td>
+<td><code>0x71dbF9C7E101FFDdb68e0C6B010099c2e39F998c</code></td>
+<td><a href="https://sepolia.etherscan.io/address/0x71dbf9c7e101ffddb68e0c6b010099c2e39f998c">View on Etherscan ↗</a></td>
+</tr>
+<tr>
+<td><strong>Mock USDT</strong></td>
+<td><code>0x2aA333AD3595Fe7812d91B9338B4Fbf5827C14A1</code></td>
+<td><a href="https://sepolia.etherscan.io/address/0x2aa333ad3595fe7812d91b9338b4fbf5827c14a1">View on Etherscan ↗</a></td>
+</tr>
+</tbody>
+</table>
+
+> 💡 **Tip:** You can use the Mock USDT contract to test the Vaultio functionality on Sepolia without needing real tokens.
 
 ---
 
@@ -791,96 +853,59 @@ Withdraw after expiration
 3. **Lock tokens:** Enter amount, set duration (in minutes), click "Lock"
 4. **Withdraw:** After lock expires, click "Withdraw" on the lock entry
 
-### Script Parameters Reference
-
-<table>
-<thead>
-<tr>
-<th>Script</th>
-<th>Parameters</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>deploy-mock</strong></td>
-<td>
-<code>TOKEN_NAME</code> - Token name<br>
-<code>TOKEN_SYMBOL</code> - Token symbol<br>
-<code>TOKEN_DECIMALS</code> - Token decimals
-</td>
-<td>Mock Token<br>MTK<br>6</td>
-</tr>
-<tr>
-<td><strong>mint</strong></td>
-<td>
-<code>TOKEN_ADDRESS</code> - Token address<br>
-<code>RECIPIENT</code> - Recipient address<br>
-<code>AMOUNT</code> - Amount to mint
-</td>
-<td>From deployed files<br>First Hardhat account<br>1000</td>
-</tr>
-<tr>
-<td><strong>approve</strong></td>
-<td>
-<code>TOKEN_ADDRESS</code> - Token address<br>
-<code>VAULTIO_ADDRESS</code> - Contract address<br>
-<code>AMOUNT</code> - Amount to approve
-</td>
-<td>From deployed files<br>From deployment<br>1000</td>
-</tr>
-<tr>
-<td><strong>lock</strong></td>
-<td>
-<code>TOKEN_ADDRESS</code> - Token address<br>
-<code>VAULTIO_ADDRESS</code> - Contract address<br>
-<code>AMOUNT</code> - Amount to lock<br>
-<code>DURATION</code> - Duration (minutes)
-</td>
-<td>From deployed files<br>From deployment<br>100<br>1</td>
-</tr>
-<tr>
-<td><strong>withdraw</strong></td>
-<td>
-<code>VAULTIO_ADDRESS</code> - Contract address<br>
-<code>LOCK_ID</code> - Lock ID
-</td>
-<td>From deployment<br>0</td>
-</tr>
-</tbody>
-</table>
-
 ---
 
 ## Screenshots
 
+### Application Features
+
 <details>
 <summary><b>View Application Screenshots</b></summary>
 
-### Landing Page
+The following screenshots demonstrate the core functionality of Vaultio:
 
-<!-- ![Landing Page](./screenshots/landing.png) -->
-*Coming soon*
+**Landing Page**
+![Landing Page](./screenshots/approve-lock-withdraw/0.png)
 
-### Dashboard
+**Approve Token**
+![Approve Token](./screenshots/approve-lock-withdraw/1.png)
 
-<!-- ![Dashboard](./screenshots/dashboard.png) -->
-*Coming soon*
+**Approve Token(Approved)**
+![Approved](./screenshots/approve-lock-withdraw/2.png)
 
-### Lock Tokens
+**Lock Tokens**
+![Lock Tokens](./screenshots/approve-lock-withdraw/2.1.png)
 
-<!-- ![Lock Tokens](./screenshots/lock.png) -->
-*Coming soon*
+**Token Locked**
+![Token Locked](./screenshots/approve-lock-withdraw/3.png)
 
-### Withdraw Tokens
+**Time Passed for Withdrawal**
+![withdrawable](./screenshots/approve-lock-withdraw/4.png)
 
-<!-- ![Withdraw Tokens](./screenshots/withdraw.png) -->
-*Coming soon*
+**Withdraw Process**
+![Withdraw Step 1](./screenshots/approve-lock-withdraw/5.png)
+![Withdraw Step 2](./screenshots/approve-lock-withdraw/6.png)
 
-### MetaMask Configuration
+</details>
 
-<!-- ![MetaMask Config](./screenshots/metamask.png) -->
-*Coming soon*
+### Network Switching
+
+<details>
+<summary><b>View Network Change Screenshots</b></summary>
+
+RainbowKit automatically handles network switching. See [Network Configuration](#network-configuration) for details.
+
+**Open Metamask**
+![Open Metamask](./screenshots/network-change/1.png)
+
+**Network Switching**
+![Switching Network](./screenshots/network-change/2.png)
+
+**Find The Network and Click**
+![Network Changed](./screenshots/network-change/3.png)
+
+**Switch Account address if Needed**
+![Dashboard After Switch](./screenshots/network-change/4.png)
 
 </details>
 
@@ -996,60 +1021,3 @@ pnpm start
 </table>
 
 > ⚠️ **Important:** Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
-
----
-
-## Troubleshooting
-
-<details>
-<summary><b>Common Issues</b></summary>
-
-### MetaMask "Nonce too high" Error
-
-This happens when MetaMask's transaction count is out of sync with the Hardhat network (often after restarting the node).
-
-**Solution:** In MetaMask, go to Settings → Advanced → Clear activity tab data
-
-### Docker Container Won't Start
-
-```bash
-# Stop all containers and rebuild
-make down
-make up-build
-```
-
-### Frontend Can't Connect to Hardhat Node
-
-1. Ensure Hardhat node is running (`make node`)
-2. Check RPC URL is `http://127.0.0.1:8545`
-3. Ensure MetaMask is configured with Chain ID `31337`
-
-### Contract Deployment Fails
-
-1. Ensure Hardhat node is running
-2. Check for sufficient funds in the deploying account
-3. Try cleaning and recompiling: `make clean && make compile`
-
-</details>
-
----
-
-## License
-
-This project is licensed under the **MIT License**.
-
----
-
-## Support
-
-For issues, questions, or contributions, please open an issue in the repository.
-
----
-
-<div align="center">
-
-**Built with Solidity, Hardhat, Next.js, Docker, and Web3 technologies**
-
-<sub>⭐ Star this repo if you find it helpful!</sub>
-
-</div>
