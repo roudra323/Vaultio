@@ -21,11 +21,6 @@ const DURATION_OPTIONS: DurationOption[] = [
   { label: "10 minutes", value: "10" },
   { label: "30 minutes", value: "30" },
   { label: "60 minutes", value: "60" },
-  { label: "360 minutes", value: "360" },
-  { label: "720 minutes", value: "720" },
-  { label: "1440 minutes", value: "1440" },
-  { label: "10080 minutes", value: "10080" },
-  { label: "43200 minutes", value: "43200" },
 ];
 
 type LockTokensFormProps = {
