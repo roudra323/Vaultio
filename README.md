@@ -8,7 +8,6 @@
 [![Hardhat](https://img.shields.io/badge/Hardhat-2.28.0-yellow.svg)](https://hardhat.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black.svg)](https://nextjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
 
@@ -16,27 +15,63 @@
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-  - [Option A: Docker (Recommended)](#option-a-docker-recommended)
-  - [Option B: Manual Setup](#option-b-manual-setup)
-- [MetaMask Configuration](#metamask-configuration)
-- [Project Structure](#project-structure)
-- [Quick Start](#quick-start)
-  - [Docker Setup (Recommended)](#docker-setup-recommended)
-  - [Manual Setup](#manual-setup)
-- [Frontend Setup](#frontend-setup)
-- [Network Configuration](#network-configuration)
-  - [Deployed Contracts (Sepolia Testnet)](#deployed-contracts-sepolia-testnet)
-- [Usage Examples](#usage-examples)
-- [Screenshots](#screenshots)
-  - [Application Features](#application-features)
-  - [Network Switching](#network-switching)
-- [Development](#development)
-- [Security Considerations](#security-considerations)
+- [Vaultio](#vaultio)
+  - [Table of Contents](#table-of-contents)
+  - [Quick Navigation](#quick-navigation)
+  - [Project Overview](#project-overview)
+    - [Key Components](#key-components)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+    - [Option A: Docker (Recommended)](#option-a-docker-recommended)
+    - [Option B: Manual Setup](#option-b-manual-setup)
+  - [MetaMask Configuration](#metamask-configuration)
+    - [Step 1: Add Hardhat Network to MetaMask](#step-1-add-hardhat-network-to-metamask)
+    - [Step 2: Import a Hardhat Test Account](#step-2-import-a-hardhat-test-account)
+  - [Project Structure](#project-structure)
+  - [Quick Start](#quick-start)
+    - [Docker Setup (Recommended)](#docker-setup-recommended)
+      - [Step 1: Clone and Start Containers](#step-1-clone-and-start-containers)
+      - [Step 2: Start Hardhat Node](#step-2-start-hardhat-node)
+      - [Step 3: Deploy Contracts](#step-3-deploy-contracts)
+      - [Step 4: Deploy Mock ERC-20 Token (Optional)](#step-4-deploy-mock-erc-20-token-optional)
+      - [Step 5: Mint Test Tokens (Optional)](#step-5-mint-test-tokens-optional)
+      - [Step 6: Configure Frontend](#step-6-configure-frontend)
+    - [Manual Setup](#manual-setup)
+      - [Step 1: Clone and Install Dependencies](#step-1-clone-and-install-dependencies)
+      - [Step 2: Start Hardhat Node](#step-2-start-hardhat-node-1)
+      - [Step 3: Deploy Contracts](#step-3-deploy-contracts-1)
+      - [Step 4: Deploy Mock ERC-20 Token (Optional)](#step-4-deploy-mock-erc-20-token-optional-1)
+      - [Step 5: Mint Test Tokens (Optional)](#step-5-mint-test-tokens-optional-1)
+      - [Step 6: Configure Frontend](#step-6-configure-frontend-1)
+  - [Frontend Setup](#frontend-setup)
+    - [1. Configure Contract Address](#1-configure-contract-address)
+    - [2. Access the Frontend](#2-access-the-frontend)
+    - [3. Connect Wallet](#3-connect-wallet)
+  - [Network Configuration](#network-configuration)
+    - [Switching Networks in the Frontend](#switching-networks-in-the-frontend)
+    - [Supported Networks](#supported-networks)
+    - [Adding a New Network](#adding-a-new-network)
+    - [Sepolia Deployment](#sepolia-deployment)
+    - [Deployed Contracts (Sepolia Testnet)](#deployed-contracts-sepolia-testnet)
+  - [Usage Examples](#usage-examples)
+    - [Complete Workflow: Approve → Lock → Withdraw](#complete-workflow-approve--lock--withdraw)
+      - [Using Command Line](#using-command-line)
+      - [Using the Frontend](#using-the-frontend)
+  - [Screenshots](#screenshots)
+    - [Application Features](#application-features)
+    - [Network Switching](#network-switching)
+  - [Development](#development)
+    - [Contract Development](#contract-development)
+    - [Frontend Development](#frontend-development)
+  - [Security Considerations](#security-considerations)
 
 ---
+
+## Quick Navigation
+
+- **Local dev (fast path):** [Docker Setup](#docker-setup-recommended) → [Frontend Setup](#frontend-setup)
+- **Sepolia deploy/verify:** [Sepolia Deployment](#sepolia-deployment) → [Deployed Contracts](#deployed-contracts-sepolia-testnet)
+- **Network switching (RainbowKit):** [Network Configuration](#network-configuration) → [Network Switching screenshots](#network-switching)
 
 ## Project Overview
 
@@ -335,9 +370,10 @@ make mint
 
 #### Step 6: Configure Frontend
 
-Now configure the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
+Now set up the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
 
-#### Docker Commands Reference
+<details>
+<summary><b>Docker Commands Reference</b></summary>
 
 <table>
 <thead>
@@ -414,6 +450,8 @@ Now configure the frontend environment variables with the deployed contract addr
 </tbody>
 </table>
 
+</details>
+
 ---
 
 ### Manual Setup
@@ -475,9 +513,10 @@ make mint
 
 #### Step 6: Configure Frontend
 
-Now configure the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
+Now set up the frontend environment variables with the deployed contract addresses. See [Frontend Setup](#frontend-setup) for detailed instructions.
 
-#### Manual Commands Reference
+<details>
+<summary><b>Manual Commands Reference</b></summary>
 
 <table>
 <thead>
@@ -546,6 +585,8 @@ Now configure the frontend environment variables with the deployed contract addr
 </tbody>
 </table>
 
+</details>
+
 ---
 
 ## Frontend Setup
@@ -576,7 +617,7 @@ NEXT_PUBLIC_VAULTIO_ADDRESS_SEPOLIA=0x71Dbf9C7e101FFDDB68e0C6B010099C2e39f998c
 
 **Docker Setup**
 
-The frontend starts automatically with previously ran command `make up`.
+The frontend starts automatically after running `make up`.
 
 Access at: **http://localhost:3000**
 
@@ -617,7 +658,7 @@ The application uses **RainbowKit** which provides automatic network switching. 
 2. Switch to any supported network (Hardhat, Sepolia, or Mainnet)
 3. The frontend automatically detects and adapts to the network change
 
-> 💡 **See it in action:** Check out the [network switching screenshots](screenshots/network-change/) demonstrating the automatic network detection.
+> 💡 **See it in action:** Check out the [network switching screenshots](#network-switching) demonstrating the automatic network detection.
 
 ### Supported Networks
 
@@ -702,7 +743,9 @@ Then set the required variables using Hardhat's secure configuration system (see
 
 </details>
 
-### Sepolia Testnet Deployment
+### Sepolia Deployment
+
+This project supports deploying and verifying the contract on **Sepolia** using Hardhat.
 
 <details>
 <summary><b>Secure Configuration with Hardhat Vars</b></summary>
@@ -746,18 +789,21 @@ npx hardhat vars get ETHERSCAN_API_KEY
 <table>
 <thead>
 <tr>
-<th>Setup</th>
-<th>Command</th>
+<th>Network</th>
+<th>Docker (from root)</th>
+<th>Manual (from contracts/)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Docker</strong></td>
-<td><code>make deploy-sepolia</code> (from root)</td>
+<td><strong>Local</strong></td>
+<td><code>make deploy-local</code></td>
+<td><code>make deploy-local</code></td>
 </tr>
 <tr>
-<td><strong>Manual</strong></td>
-<td><code>make deploy-sepolia</code> (from contracts/)</td>
+<td><strong>Sepolia</strong></td>
+<td><code>make deploy-sepolia</code></td>
+<td><code>make deploy-sepolia</code></td>
 </tr>
 </tbody>
 </table>
@@ -860,6 +906,8 @@ Withdraw after expiration
 
 ## Screenshots
 
+<a id="application-features"></a>
+
 ### Application Features
 
 <details>
@@ -873,7 +921,7 @@ The following screenshots demonstrate the core functionality of Vaultio:
 **Approve Token**
 ![Approve Token](./screenshots/approve-lock-withdraw/1.png)
 
-**Approve Token(Approved)**
+**Approve Token (Approved)**
 ![Approved](./screenshots/approve-lock-withdraw/2.png)
 
 **Lock Tokens**
@@ -890,6 +938,8 @@ The following screenshots demonstrate the core functionality of Vaultio:
 ![Withdraw Step 2](./screenshots/approve-lock-withdraw/6.png)
 
 </details>
+
+<a id="network-switching"></a>
 
 ### Network Switching
 
@@ -1007,8 +1057,7 @@ pnpm start
 <td>
 
 ✓ SafeERC20 for secure transfers  
-✓ Reentrancy protection  
-✓ EOA-only lock creation  
+✓ Reentrancy protection   
 ✓ Input validation
 
 </td>
@@ -1022,5 +1071,3 @@ pnpm start
 </td>
 </tr>
 </table>
-
-> ⚠️ **Important:** Always audit smart contracts before deploying to mainnet. This code is provided as-is for educational purposes.
