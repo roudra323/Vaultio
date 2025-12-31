@@ -71,7 +71,7 @@
 
 ## Quick Navigation
 
-- **Live Demo:** [https://vaultio-nine.vercel.app](https://vaultio-nine.vercel.app) (Sepolia Testnet)
+- **Live Demo:** [https://vaultio-nine.vercel.app](https://vaultio-nine.vercel.app) (Sepolia Testnet , Use  <a href="https://sepolia.etherscan.io/address/0x2aa333ad3595fe7812d91b9338b4fbf5827c14a1">Mock USDT</a> for minting tokens)
 - **Local dev (fast path):** [Docker Setup](#docker-setup-recommended) → [Frontend Setup](#frontend-setup)
 - **Sepolia deploy/verify:** [Sepolia Deployment](#sepolia-deployment) → [Deployed Contracts](#deployed-contracts-sepolia-testnet)
 - **Network switching (RainbowKit):** [Network Configuration](#network-configuration) → [Network Switching screenshots](#network-switching)
